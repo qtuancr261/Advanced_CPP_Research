@@ -1,11 +1,11 @@
 #ifndef GOBYFLYINGALGORITHM_H
 #define GOBYFLYINGALGORITHM_H
-#include "goalgorithm.h"
+#include "gostrategy.h"
 
-class GoByFlyingAlgorithm : public GoAlgorithm
+class GoByFlyingStrategy : public GoStrategy
 {
 public:
-    GoByFlyingAlgorithm();
+    GoByFlyingStrategy();
     void go() const;
 };
 

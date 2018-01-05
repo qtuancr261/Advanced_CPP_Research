@@ -1,8 +1,8 @@
 #ifndef GOBYDRIVEALGORITHM_H
 #define GOBYDRIVEALGORITHM_H
-#include "goalgorithm.h"
+#include "gostrategy.h"
 
-class GoByDriveAlgorithm : public GoAlgorithm
+class GoByDriveStrategy : public GoStrategy
 {
 public:
     void go() const;

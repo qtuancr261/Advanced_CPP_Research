@@ -4,7 +4,7 @@
 using std::cout;
 using std::endl;
 using std::cin;
-class GoAlgorithm
+class GoStrategy
 {
 public:
     virtual void go() const = 0;
