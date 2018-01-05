@@ -1,16 +1,19 @@
 #ifndef VEHICLE_H
 #define VEHICLE_H
-#include "goalgorithm.h"
-
+#include "strategy/gobydrivestrategy.h"
+#include "strategy/gobyflyingstrategy.h"
+#include "strategy/gobyflyingfaststrategy.h"
 class Vehicle
 {
 private:
-    GoAlgorithm goAlgorithm;
+    // "has a" relationship instead of "is a" relationship
+    GoStrategy* goStrategy;
 public:
     Vehicle();
-    GoAlgorithm getGoAlgorithm() const;
-    void setGoAlgorithm(const GoAlgorithm &value);
+    const GoStrategy* getGoStrategy() const;
+    void setGoStrategy(GoStrategy *value);
     void go() const;
+    virtual ~Vehicle();
 };
 
 #endif // VEHICLE_H

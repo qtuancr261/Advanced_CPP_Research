@@ -1,21 +1,30 @@
 #include "vehicle.h"
 
-GoAlgorithm Vehicle::getGoAlgorithm() const
+const GoStrategy *Vehicle::getGoStrategy() const
 {
-    return goAlgorithm;
+    return goStrategy;
 }
 
-void Vehicle::setGoAlgorithm(const GoAlgorithm &value)
+void Vehicle::setGoStrategy(GoStrategy *value)
 {
-    goAlgorithm = value;
+    // Release memory for the past strategy
+    delete goStrategy;
+    goStrategy = value;
 }
 
 void Vehicle::go() const
 {
-    goAlgorithm.go();
+    goStrategy->go();
 }
 
-Vehicle::Vehicle()
+Vehicle::~Vehicle()
+{
+    // Release memory
+    cout << "Release memory" << endl;
+    delete goStrategy;
+}
+
+Vehicle::Vehicle() : goStrategy{nullptr}
 {
 
 }
