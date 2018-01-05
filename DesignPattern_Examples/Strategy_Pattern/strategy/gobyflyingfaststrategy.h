@@ -5,7 +5,7 @@
 class GoByFlyingFastStrategy : public GoStrategy
 {
 public:
-    GoByFlyingFastStrategy();
+    GoByFlyingFastStrategy() = default;
     void go() const;
 };
 

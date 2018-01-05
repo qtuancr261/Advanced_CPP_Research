@@ -5,6 +5,7 @@
 class GoByDriveStrategy : public GoStrategy
 {
 public:
+    GoByDriveStrategy() = default;
     void go() const;
 };
 
