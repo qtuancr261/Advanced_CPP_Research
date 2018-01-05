@@ -2,5 +2,5 @@
 
 FOneFomular::FOneFomular()
 {
-
+    setGoStrategy(new GoByDriveStrategy{});
 }

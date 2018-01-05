@@ -2,5 +2,5 @@
 
 Car::Car()
 {
-
+    setGoStrategy(new GoByDriveStrategy{});
 }

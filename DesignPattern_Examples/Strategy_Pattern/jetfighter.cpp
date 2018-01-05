@@ -2,5 +2,5 @@
 
 JetFighter::JetFighter()
 {
-
+    setGoStrategy(new GoByFlyingFastStrategy());
 }

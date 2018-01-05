@@ -2,5 +2,5 @@
 
 Helicopter::Helicopter()
 {
-
+    setGoStrategy(new GoByFlyingStrategy);
 }
