@@ -1,11 +1,13 @@
 #ifndef CPU_H
 #define CPU_H
+#include "componentdecorator.h"
 
-
-class CPU
+class CPU : public ComponentDecorator
 {
 public:
-    CPU();
+    explicit CPU(Computer *computer);
+    virtual string description() const final;
+    ~CPU();
 };
 
 #endif // CPU_H
