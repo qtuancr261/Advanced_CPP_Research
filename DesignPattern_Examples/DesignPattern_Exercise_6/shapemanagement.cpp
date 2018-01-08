@@ -1,62 +1,67 @@
 #include "shapemanagement.h"
-
-ShapeManagement::ShapeManagement()
+ShapeManagement::ShapeManagement() : factory{new Shape2DFactory}
 {
 
 }
 
 ShapeManagement::~ShapeManagement()
 {
-
+    cout << "Releasing Memory" << endl;
+    delete factory;
+    Shape* tempShapePtr{nullptr};
+    while(!undoStack.empty())
+    {
+        tempShapePtr = undoStack.top();
+        if (!shapeMatch(tempShapePtr))
+        {
+            delete tempShapePtr;
+        }
+        undoStack.pop();
+    }
+    while(!redoStack.empty())
+    {
+        tempShapePtr = redoStack.top();
+        if (!shapeMatch(tempShapePtr))
+        {
+            delete tempShapePtr;
+        }
+        redoStack.pop();
+    }
+    while(!shapes.empty())
+    {
+        tempShapePtr = shapes.back();
+        delete tempShapePtr;
+        shapes.pop_back();
+    }
 }
 
 void ShapeManagement::addShape()
 {
     int shapeType{0};
-    cout << "1. Rectangle.\n";
-    cout << "2. Circle.\n";
-    cout << "  -> Shape type: ";
-    cin >> shapeType;
+    Shape* newShape{};
+    shapeType = menu.viewAddNewShapeMenu();
     switch (shapeType)
     {
     case 1:
-    {
-        Shape* newShape{new Rectangle{}};
-        newShape->inputData();
-        // Save index of the new Shape in shapes list
-        newShape->setUndoIndex(shapes.size());
-        // Save the current action of the new Shape
-        newShape->setCurrentAction(ActionEnum::Add);
-        shapes.push_back(newShape);
-        undoStack.push(newShape);
-        // Clear redo stack when beginning a new action
-        while(!redoStack.empty())
         {
-            redoStack.pop();
+            newShape = factory->createStraightShape();
+            break;
         }
-        break;
-    }
     case 2:
-    {
-        Shape* newShape{new Circle{}};
-        newShape->inputData();
-        // Save index of the new Shape in shapes list
-        newShape->setUndoIndex(shapes.size());
-         // Save the current action of the new Shape
-        newShape->setCurrentAction(ActionEnum::Add);
-        shapes.push_back(newShape);
-        undoStack.push(newShape);
-        // Clear redo stack when beginning a new action
-        while(!redoStack.empty())
         {
-            redoStack.pop();
+            newShape = factory->createCurvedShape();
+            break;
         }
-        break;
     }
-    default:
-
-        cout << "Invalid type. Please input again." << endl;
-        break;
+    newShape->setUndoIndex(shapes.size());
+    // Save the current action of the new Shape
+    newShape->setCurrentAction(ActionEnum::Add);
+    shapes.push_back(newShape);
+    undoStack.push(newShape);
+    // Clear redo stack when beginning a new action
+    while(!redoStack.empty())
+    {
+        redoStack.pop();
     }
 }
 
@@ -67,6 +72,16 @@ void ShapeManagement::listShapes() const
     {
         (*iter)->outputData();
     }
+}
+
+bool ShapeManagement::shapeMatch(Shape *shape) const
+{
+    for (auto iter = shapes.begin(); iter != shapes.end(); iter++)
+    {
+        if (*iter == shape)
+            return true;
+    }
+    return false;
 }
 
 Shape *ShapeManagement::at(int index)
@@ -83,7 +98,7 @@ Shape *ShapeManagement::removeAt(int index)
     // check index
     if (index >= shapes.size() || index < 0)
     {
-        cerr << "Invalid index. Couldn't remove at " << index;
+        cerr << "Invalid index. Couldn't remove at " << index << endl;
          return nullptr;
     }
     auto rmIter = shapes.begin();
@@ -98,7 +113,10 @@ Shape *ShapeManagement::removeAt(int index)
 void ShapeManagement::undo()
 {
     if (undoStack.size() == 0)
+    {
+        cout << "Couldn't undo" << endl;
         return;
+    }
     Shape* undoShape{undoStack.top()};
 
     switch (undoShape->getCurrentAction())
@@ -126,12 +144,16 @@ void ShapeManagement::undo()
     }
     redoStack.push(undoShape);
     undoStack.pop();
+    cout << "Undo successfully" << endl;
 }
 
 void ShapeManagement::redo()
 {
     if (redoStack.size() == 0)
+    {
+        cout << "Couldn't redo" << endl;
         return;
+    }
     Shape* redoShape{redoStack.top()};
 
     switch (redoShape->getCurrentUDAction())
@@ -159,4 +181,42 @@ void ShapeManagement::redo()
     }
     undoStack.push(redoShape);
     redoStack.pop();
+    cout << "Redo successfully" << endl;
+}
+
+void ShapeManagement::exec()
+{
+    do
+    {
+         menu.viewMainMenu();
+         switch (menu.getMainMenuSelection())
+         {
+         case 1:
+             addShape();
+             cout << "Added successfully. ";
+             system("pause");
+             break;
+         case 2:
+             removeAt(menu.viewRemoveShapeMenu());
+             system("pause");
+             break;
+         case 3:
+             undo();
+             system("pause");
+             break;
+         case 4:
+             redo();
+             system("pause");
+             break;
+         case 5:
+             menu.viewAllShapes(shapes);
+             system("pause");
+             break;
+         case 6:
+             break;
+         default:
+             break;
+         }
+    }while(menu.getMainMenuSelection() != 6);
+
 }
