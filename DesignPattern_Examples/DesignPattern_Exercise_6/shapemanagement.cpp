@@ -8,31 +8,30 @@ ShapeManagement::~ShapeManagement()
 {
     cout << "Releasing Memory" << endl;
     delete factory;
+    cout << "Before: " << shapes.size() << endl;
     Shape* tempShapePtr{nullptr};
     while(!undoStack.empty())
     {
-        tempShapePtr = undoStack.top();
-        if (!shapeMatch(tempShapePtr))
-        {
-            delete tempShapePtr;
-        }
+        shapes.push_back(undoStack.top());
         undoStack.pop();
     }
     while(!redoStack.empty())
     {
-        tempShapePtr = redoStack.top();
-        if (!shapeMatch(tempShapePtr))
-        {
-            delete tempShapePtr;
-        }
+        shapes.push_back(redoStack.top());
         redoStack.pop();
     }
+    cout << "Before unique: " << shapes.size() << endl;
+    shapes.sort();
+    shapes.unique();
+    cout << "After unique: " << shapes.size() << endl;
     while(!shapes.empty())
     {
         tempShapePtr = shapes.back();
         delete tempShapePtr;
+        //cout << tempShapePtr  << " " << shapes.back() << " -> ";
         shapes.pop_back();
     }
+    cout << "After deleted: " << shapes.size() << endl;
 }
 
 void ShapeManagement::addShape()
@@ -74,12 +73,16 @@ void ShapeManagement::listShapes() const
     }
 }
 
-bool ShapeManagement::shapeMatch(Shape *shape) const
+bool ShapeManagement::isStoredInShapesList(Shape *shape) const
 {
     for (auto iter = shapes.begin(); iter != shapes.end(); iter++)
     {
+        cout << "Iter " << *iter << " shape " << shape << endl;
         if (*iter == shape)
+        {
+            cout << "BINGO";
             return true;
+        }
     }
     return false;
 }

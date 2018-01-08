@@ -24,7 +24,7 @@ public:
     virtual ~ShapeManagement();
     void addShape();
     void listShapes() const;
-    bool shapeMatch(Shape* shape) const;
+    bool isStoredInShapesList(Shape* shape) const;
     Shape *at(int index);
     Shape* removeAt(int index);
     void undo();
