@@ -1,13 +1,14 @@
 #include "shape2dfactory.h"
-
-Shape *Shape2DFactory::createShape(int type)
+Shape *Shape2DFactory::createStraightShape()
 {
-    switch (type)
-    {
-    case static_cast<int>(TypeEnum::Circle):
+    Shape* newShape{new Rectangle};
+    newShape->inputData();
+    return newShape;
+}
 
-        break;
-    default:
-        break;
-    }
+Shape *Shape2DFactory::createCurvedShape()
+{
+    Shape* newShape{new Circle};
+    newShape->inputData();
+    return newShape;
 }
