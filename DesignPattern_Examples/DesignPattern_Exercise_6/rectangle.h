@@ -12,7 +12,6 @@ public:
     virtual void inputData() override;
     virtual void outputData() const override;
     virtual double area() const override;
-    void justTest();
 };
 
 #endif // RECTANGLE_H

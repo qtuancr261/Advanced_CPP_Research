@@ -26,8 +26,3 @@ double Rectangle::area() const
     return width * height;
 }
 
-void Rectangle::justTest()
-{
-    cout << "RECT" << endl;
-}
-
