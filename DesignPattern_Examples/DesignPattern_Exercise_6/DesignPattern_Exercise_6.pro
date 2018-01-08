@@ -19,7 +19,13 @@ SOURCES += main.cpp \
     shape.cpp \
     rectangle.cpp \
     circle.cpp \
-    shapemanagement.cpp
+    shapemanagement.cpp \
+    Factory/shape2dfactory.cpp \
+    Factory/shape3dfactory.cpp \
+    cuboid.cpp \
+    sphere.cpp \
+    shapeview.cpp
+
 
 HEADERS += \
     point.h \
@@ -27,4 +33,10 @@ HEADERS += \
     rectangle.h \
     circle.h \
     shapemanagement.h \
-    actionenum.h
+    actionenum.h \
+    Factory/shape2dfactory.h \
+    Factory/shapefactory.h \
+    Factory/shape3dfactory.h \
+    cuboid.h \
+    sphere.h \
+    shapeview.h
