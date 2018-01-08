@@ -22,8 +22,3 @@ double Circle::area() const
 {
     return PI * radius * radius;
 }
-
-void Circle::justTest()
-{
-    cout << "CIRCLE" << endl;
-}
