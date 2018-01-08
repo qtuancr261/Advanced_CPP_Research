@@ -2,13 +2,15 @@
 #define SHAPE_H
 #include "point.h"
 #include <iostream>
-#include "stack"
+#include <stack>
+#include <string>
 #include "actionenum.h"
 using std::cin;
 using std::cout;
 using std::cerr;
 using std::endl;
 using std::stack;
+using std::string;
 const double PI{3.14};
 class Shape
 {
@@ -22,7 +24,6 @@ public:
     virtual void inputData() = 0;
     virtual void outputData() const = 0;
     virtual double area() const = 0;
-    void justTest();
     virtual ~Shape() = default;
 
     int getUndoIndex() const;

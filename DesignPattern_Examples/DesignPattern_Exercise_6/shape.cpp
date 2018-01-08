@@ -51,7 +51,3 @@ Shape::Shape() : centralPoint{}, undoIndex{0}
     // default contructor
 }
 
-void Shape::justTest()
-{
-    cout << "Base Shape" << endl;
-}
