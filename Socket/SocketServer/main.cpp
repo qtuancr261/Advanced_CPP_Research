@@ -7,6 +7,7 @@
 #include <iostream>
 #include <list>
 using namespace std;
+const int MAXSIZE{200};
 list<int> client_socketFDs;
 void* handleNewClientConnection(void* client_socket)
 {
@@ -14,17 +15,17 @@ void* handleNewClientConnection(void* client_socket)
     client_socketFDs.push_back(client_socketFD);
     // Welcome new client with a message
     char messageFromServer[]{"Welcome to chat box. Have a nice day ! \n"};
-    char replyMessageFromServer[]{"I got it"};
+    //char replyMessageFromServer[]{"I got it"};
     send(client_socketFD, messageFromServer, strlen(messageFromServer), 0);
     // Begin receiving from client
-    char messageFromClient[2000]{};
-    //int recvFlag{};
-    while(recv(client_socketFD, messageFromClient, 2000, 0) > 0)
+    char messageFromClient[MAXSIZE]{};
+    while(recv(client_socketFD, messageFromClient, MAXSIZE, 0) > 0)
     {
         cout << messageFromClient << endl;
         for (auto iterClient_socketFD = begin(client_socketFDs); iterClient_socketFD != end(client_socketFDs); iterClient_socketFD++)
             if (*iterClient_socketFD != client_socketFD)
                 send(*iterClient_socketFD, messageFromClient, strlen(messageFromClient), 0);
+        strcpy(messageFromClient, "");
     }
      cout << "Client disconnected" << endl;
 }
@@ -44,7 +45,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
     // listen
-    listen(socket_server, 3);
+    listen(socket_server, 5);
     cout << "Waiting for incoming connection " << endl;
     sockaddr_in client{};
     int client_size{sizeof(sockaddr_in)};
