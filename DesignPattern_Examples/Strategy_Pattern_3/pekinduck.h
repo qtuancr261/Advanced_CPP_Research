@@ -1,8 +1,9 @@
 #ifndef PEKINDUCK_H
 #define PEKINDUCK_H
-
-
-class PekinDuck
+#include "duck.h"
+#include "behavior/flywithwings.h"
+#include "behavior/quackquack.h"
+class PekinDuck : public Duck
 {
 public:
     PekinDuck();
