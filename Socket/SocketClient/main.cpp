@@ -2,11 +2,48 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <netinet/in.h>
+#include <sys/sendfile.h>
 #include <pthread.h>
 #include <cstring>
 #include <cstdio>
 #include <iostream>
+#include <fstream>
+#include <string>
 using namespace std;
+const char SEND_FILE_HEADER_MESSAGE[]{"<FILE>"};
+string getFileNameFromMessage(char* message)
+{
+    char* subString{};
+    char* fileName{};
+    subString = strtok(message, " ");
+    while(subString != nullptr)
+    {
+        fileName = subString;
+        //printf("part: %s", subString);
+        subString = strtok(nullptr, " ");
+    }
+    return string(fileName);
+}
+string getBinaryDataFromFile(string fileName)
+{
+    ifstream file{fileName, ios::in | ios::ate | ios::binary};
+    if (file.is_open())
+    {
+        int binaryDataSize{static_cast<int>(file.tellg())};
+        char* binaryDataFromFile{new char[binaryDataSize]{}};
+        file.seekg(0, ios::beg);
+        file.read(binaryDataFromFile, binaryDataSize);
+        file.close();
+        return string(binaryDataFromFile);
+    }
+    else
+        printf("open failed");
+    return nullptr;
+}
+string createMessageForSendFile(string fileName, string binaryDataFromFile)
+{
+    return string(SEND_FILE_HEADER_MESSAGE) + " " + fileName + " " + binaryDataFromFile;
+}
 void* handlerSendStream(void* client_socket)
 {
     int client_socketFD{*(int*)client_socket};
@@ -15,10 +52,17 @@ void* handlerSendStream(void* client_socket)
         char messageFromClient[200]{};
         int send_size{};
         fgets(messageFromClient, 200, stdin);
-        send_size = send(client_socketFD, messageFromClient, strlen(messageFromClient), 0);
-        if (send_size == 0)
+        if (strstr(messageFromClient, SEND_FILE_HEADER_MESSAGE) != nullptr)
         {
-             printf("server dis");
+            string fileName{getFileNameFromMessage(messageFromClient)};
+            fileName.pop_back();
+            string binaryData{getBinaryDataFromFile(fileName)};
+            cout << createMessageForSendFile(fileName, binaryData);
+        }
+        send_size = send(client_socketFD, messageFromClient, strlen(messageFromClient), 0);
+        if (send_size <= 0)
+        {
+             printf("server has been terminated");
              pthread_exit(nullptr);
         }
     }
@@ -35,7 +79,7 @@ void* handlerReceiveStream(void *client_socket)
             printf("\n-> %s", messageFromServer);
         else if (recv_size == 0)
         {
-             printf("server dis");
+             printf("server dis from recv");
              pthread_exit(nullptr);
         }
     }
@@ -78,5 +122,6 @@ int main(int argc, char *argv[])
     cin.getline(messageFromClient, 2000);
     send(client_socket, messageFromClient, strlen(messageFromClient), 0);*/
     close(client_socket);
+    delete ptrClient_socket;
     return 0;
 }
