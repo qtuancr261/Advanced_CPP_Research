@@ -14,17 +14,18 @@ const char SEND_FILE_HEADER_MESSAGE[]{"<FILE>"};
 string getFileNameFromMessage(char* message)
 {
     char* subString{};
-    char* fileName{};
+    //char* fileName{};
     subString = strtok(message, " ");
-    while(subString != nullptr)
+    /*while(subString != nullptr)
     {
         fileName = subString;
-        //printf("part: %s", subString);
         subString = strtok(nullptr, " ");
-    }
-    return string(fileName);
+        //printf("part: %s", subString);
+    }*/
+    subString = strtok(nullptr, " ");
+    return string(subString);
 }
-string getBinaryDataFromFile(string fileName)
+string readBinaryDataFromFile(string fileName)
 {
     ifstream file{fileName, ios::in | ios::ate | ios::binary};
     if (file.is_open())
@@ -39,6 +40,34 @@ string getBinaryDataFromFile(string fileName)
     else
         printf("open failed");
     return nullptr;
+}
+string readBinaryDataFromMessage(char* message)
+{
+    char* subString{};
+    //char* fileName{};
+    subString = strtok(message, " ");
+    /*while(subString != nullptr)
+    {
+        fileName = subString;
+        subString = strtok(nullptr, " ");
+        //printf("part: %s", subString);
+    }*/
+    subString = strtok(nullptr, " ");
+    subString = strtok(nullptr, " ");
+    return string(subString);
+}
+void writeBinaryDataToFile(string fileName, string binaryData)
+{
+    ofstream fileO{fileName, ios::out | ios::ate};
+    if (fileO.is_open())
+    {
+        cout << "Ok - O" << endl;
+        fileO.seekp(0, ios::beg);
+        fileO.write(binaryData.c_str(), binaryData.length());
+        fileO.close();
+    }
+    else
+        cout << "error - O" ;
 }
 string createMessageForSendFile(string fileName, string binaryDataFromFile)
 {
@@ -56,10 +85,14 @@ void* handlerSendStream(void* client_socket)
         {
             string fileName{getFileNameFromMessage(messageFromClient)};
             fileName.pop_back();
-            string binaryData{getBinaryDataFromFile(fileName)};
+            string binaryData{readBinaryDataFromFile(fileName)};
             cout << createMessageForSendFile(fileName, binaryData);
+            string message{createMessageForSendFile(fileName, binaryData)};
+            send_size = send(client_socketFD, message.c_str(), message.length(), 0);
         }
-        send_size = send(client_socketFD, messageFromClient, strlen(messageFromClient), 0);
+        else
+            send_size = send(client_socketFD, messageFromClient, strlen(messageFromClient), 0);
+
         if (send_size <= 0)
         {
              printf("server has been terminated");
@@ -76,7 +109,16 @@ void* handlerReceiveStream(void *client_socket)
         char messageFromServer[200]{};
         recv_size = recv(client_socketFD, messageFromServer, 200, 0);
         if (recv_size > 0)
+        {
             printf("\n-> %s", messageFromServer);
+            if (strstr(messageFromServer, SEND_FILE_HEADER_MESSAGE) != nullptr)
+            {
+                string filename = getFileNameFromMessage(messageFromServer);
+                string data = string(strtok(nullptr, " "));
+               writeBinaryDataToFile(filename, data);
+            }
+        }
+
         else if (recv_size == 0)
         {
              printf("server dis from recv");
