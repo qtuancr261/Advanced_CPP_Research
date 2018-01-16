@@ -8,8 +8,42 @@
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <string>
 using namespace std;
-const char SENFILEMODE[]{"<FILE>\n"};
+const char SEND_FILE_HEADER_MESSAGE[]{"<FILE>"};
+string getFileNameFromMessage(char* message)
+{
+    char* subString{};
+    char* fileName{};
+    subString = strtok(message, " ");
+    while(subString != nullptr)
+    {
+        fileName = subString;
+        //printf("part: %s", subString);
+        subString = strtok(nullptr, " ");
+    }
+    return string(fileName);
+}
+string getBinaryDataFromFile(string fileName)
+{
+    ifstream file{fileName, ios::in | ios::ate | ios::binary};
+    if (file.is_open())
+    {
+        int binaryDataSize{static_cast<int>(file.tellg())};
+        char* binaryDataFromFile{new char[binaryDataSize]{}};
+        file.seekg(0, ios::beg);
+        file.read(binaryDataFromFile, binaryDataSize);
+        file.close();
+        return string(binaryDataFromFile);
+    }
+    else
+        printf("open failed");
+    return nullptr;
+}
+string createMessageForSendFile(string fileName, string binaryDataFromFile)
+{
+    return string(SEND_FILE_HEADER_MESSAGE) + " " + fileName + " " + binaryDataFromFile;
+}
 void* handlerSendStream(void* client_socket)
 {
     int client_socketFD{*(int*)client_socket};
@@ -18,13 +52,12 @@ void* handlerSendStream(void* client_socket)
         char messageFromClient[200]{};
         int send_size{};
         fgets(messageFromClient, 200, stdin);
-        if (strcmp(messageFromClient, SENFILEMODE) == 0)
-            printf("equal FILE MODE");
-        else
+        if (strstr(messageFromClient, SEND_FILE_HEADER_MESSAGE) != nullptr)
         {
-            printf("not equal");
-            printf("%s" ,messageFromClient);
-            printf("%s",SENFILEMODE);
+            string fileName{getFileNameFromMessage(messageFromClient)};
+            fileName.pop_back();
+            string binaryData{getBinaryDataFromFile(fileName)};
+            cout << createMessageForSendFile(fileName, binaryData);
         }
         send_size = send(client_socketFD, messageFromClient, strlen(messageFromClient), 0);
         if (send_size <= 0)
@@ -50,21 +83,6 @@ void* handlerReceiveStream(void *client_socket)
              pthread_exit(nullptr);
         }
     }
-}
-char* getBinaryDataFromFile(const char* fileName)
-{
-    ifstream file{fileName, ios::in | ios::ate};
-    if (file.is_open())
-    {
-        printf("opening and reading %s ", fileName);
-        int binaryDataSize{static_cast<int>(file.tellg())};
-        char* binaryDataFromFile{new char[binaryDataSize]{}};
-        file.seekg(0, ios::beg);
-        file.read(binaryDataFromFile, binaryDataSize);
-        file.close();
-        return binaryDataFromFile;
-    }
-    return nullptr;
 }
 int main(int argc, char *argv[])
 {
