@@ -2,11 +2,14 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <netinet/in.h>
+#include <sys/sendfile.h>
 #include <pthread.h>
 #include <cstring>
 #include <cstdio>
 #include <iostream>
+#include <fstream>
 using namespace std;
+const char SENFILEMODE[]{"<FILE>\n"};
 void* handlerSendStream(void* client_socket)
 {
     int client_socketFD{*(int*)client_socket};
@@ -15,10 +18,18 @@ void* handlerSendStream(void* client_socket)
         char messageFromClient[200]{};
         int send_size{};
         fgets(messageFromClient, 200, stdin);
-        send_size = send(client_socketFD, messageFromClient, strlen(messageFromClient), 0);
-        if (send_size == 0)
+        if (strcmp(messageFromClient, SENFILEMODE) == 0)
+            printf("equal FILE MODE");
+        else
         {
-             printf("server dis");
+            printf("not equal");
+            printf("%s" ,messageFromClient);
+            printf("%s",SENFILEMODE);
+        }
+        send_size = send(client_socketFD, messageFromClient, strlen(messageFromClient), 0);
+        if (send_size <= 0)
+        {
+             printf("server has been terminated");
              pthread_exit(nullptr);
         }
     }
@@ -35,10 +46,25 @@ void* handlerReceiveStream(void *client_socket)
             printf("\n-> %s", messageFromServer);
         else if (recv_size == 0)
         {
-             printf("server dis");
+             printf("server dis from recv");
              pthread_exit(nullptr);
         }
     }
+}
+char* getBinaryDataFromFile(const char* fileName)
+{
+    ifstream file{fileName, ios::in | ios::ate};
+    if (file.is_open())
+    {
+        printf("opening and reading %s ", fileName);
+        int binaryDataSize{static_cast<int>(file.tellg())};
+        char* binaryDataFromFile{new char[binaryDataSize]{}};
+        file.seekg(0, ios::beg);
+        file.read(binaryDataFromFile, binaryDataSize);
+        file.close();
+        return binaryDataFromFile;
+    }
+    return nullptr;
 }
 int main(int argc, char *argv[])
 {
@@ -78,5 +104,6 @@ int main(int argc, char *argv[])
     cin.getline(messageFromClient, 2000);
     send(client_socket, messageFromClient, strlen(messageFromClient), 0);*/
     close(client_socket);
+    delete ptrClient_socket;
     return 0;
 }
