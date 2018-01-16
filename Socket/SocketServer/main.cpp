@@ -50,8 +50,6 @@ int main(int argc, char *argv[])
     sockaddr_in client{};
     int client_size{sizeof(sockaddr_in)};
     int client_socket{};
-    char messageFromServer[]{"Hello client"};
-    char messageFromClient[2000];
     while((client_socket = accept(socket_server, (sockaddr*)&client, (socklen_t*)&client_size)))
     {
         if (client_socket < 0)
