@@ -6,8 +6,9 @@
 #include <cstring>
 #include <iostream>
 #include <list>
+#include <cstdio>
 using namespace std;
-const int MAXSIZE{200};
+const int MAXSIZE{20000};
 list<int> client_socketFDs;
 void* handleNewClientConnection(void* client_socket)
 {
@@ -21,10 +22,11 @@ void* handleNewClientConnection(void* client_socket)
     char messageFromClient[MAXSIZE]{};
     while(recv(client_socketFD, messageFromClient, MAXSIZE, 0) > 0)
     {
+        //printf("data from client: %s", messageFromClient);
         cout << messageFromClient << endl;
         for (auto iterClient_socketFD = begin(client_socketFDs); iterClient_socketFD != end(client_socketFDs); iterClient_socketFD++)
             if (*iterClient_socketFD != client_socketFD)
-                send(*iterClient_socketFD, messageFromClient, strlen(messageFromClient), 0);
+                send(*iterClient_socketFD, messageFromClient, MAXSIZE, 0);
         strcpy(messageFromClient, "");
     }
      cout << "Client disconnected" << endl;
