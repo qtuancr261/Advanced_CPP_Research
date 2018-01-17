@@ -34,8 +34,13 @@ string readBinaryDataFromFile(string fileName)
         char* binaryDataFromFile{new char[binaryDataSize]{}};
         file.seekg(0, ios::beg);
         file.read(binaryDataFromFile, binaryDataSize);
+        cout << binaryDataFromFile << endl;
+        string data(binaryDataSize, ' ');
+        for(int i{}; i < binaryDataSize; i++)
+            data[i] = binaryDataFromFile[i];
+        //printf("%d - %d ", binaryDataSize, data.length());
         file.close();
-        return string(binaryDataFromFile);
+        return data;
     }
     else
         printf("open failed");
@@ -56,22 +61,43 @@ string readBinaryDataFromMessage(char* message)
     subString = strtok(nullptr, " ");
     return string(subString);
 }
-void writeBinaryDataToFile(string fileName, string binaryData)
+void writeBinaryDataToFile(string fileName, string binaryDataStr, string binaryDataSize)
 {
+    int dataSize{stoi(binaryDataSize)};
+    char* binaryData{new char[dataSize]{}};
+    for (int i{}; i < dataSize; i++)
+        binaryData[i] = binaryDataStr[i];
     ofstream fileO{fileName, ios::out | ios::ate};
     if (fileO.is_open())
     {
         cout << "Ok - O" << endl;
         fileO.seekp(0, ios::beg);
-        fileO.write(binaryData.c_str(), binaryData.length());
+        fileO.write(binaryData, dataSize);
         fileO.close();
     }
     else
         cout << "error - O" ;
 }
+char* getBinaryArrayFromString(string data)
+{
+    //cout << data.length() << endl;
+    char* binaryData{new char[data.length()]{}};
+    for (int i{}; i < data.length(); i++)
+    {
+        binaryData[i] = data[i];
+        //cout << " -> " << binaryData[i];
+    }
+    //cout << binaryData << endl;
+    //printf("data: %s", binaryData);
+    return binaryData;
+}
 string createMessageForSendFile(string fileName, string binaryDataFromFile)
 {
-    return string(SEND_FILE_HEADER_MESSAGE) + " " + fileName + " " + binaryDataFromFile;
+    return string(SEND_FILE_HEADER_MESSAGE) + " " + fileName + " " + to_string( binaryDataFromFile.length()) + " " + binaryDataFromFile;
+}
+void getAllDataFromMessage(char* message, string& fileName, string& binaryData, string& dataSize)
+{
+
 }
 void* handlerSendStream(void* client_socket)
 {
@@ -86,9 +112,11 @@ void* handlerSendStream(void* client_socket)
             string fileName{getFileNameFromMessage(messageFromClient)};
             fileName.pop_back();
             string binaryData{readBinaryDataFromFile(fileName)};
-            cout << createMessageForSendFile(fileName, binaryData);
+            //cout << binaryData.length() << endl;
+            //cout << createMessageForSendFile(fileName, binaryData);
             string message{createMessageForSendFile(fileName, binaryData)};
-            send_size = send(client_socketFD, message.c_str(), message.length(), 0);
+            //cout << message.length() << getBinaryArrayFromString(message) << endl;
+            send_size = send(client_socketFD, getBinaryArrayFromString(message), message.length(), 0);
         }
         else
             send_size = send(client_socketFD, messageFromClient, strlen(messageFromClient), 0);
@@ -106,16 +134,24 @@ void* handlerReceiveStream(void *client_socket)
     while(true)
     {
         int recv_size{};
-        char messageFromServer[200]{};
-        recv_size = recv(client_socketFD, messageFromServer, 200, 0);
+        char messageFromServer[200000]{};
+        recv_size = recv(client_socketFD, messageFromServer, 200000, 0);
         if (recv_size > 0)
         {
-            printf("\n-> %s", messageFromServer);
+            //printf("\n-> %s", messageFromServer);
             if (strstr(messageFromServer, SEND_FILE_HEADER_MESSAGE) != nullptr)
             {
                 string filename = getFileNameFromMessage(messageFromServer);
+                string dataSize = string(strtok(nullptr, " "));
                 string data = string(strtok(nullptr, " "));
-               writeBinaryDataToFile(filename, data);
+                char* tokStr{strtok(nullptr, " ")};
+                while(tokStr != nullptr)
+                {
+                    data.append(" " + string(tokStr));
+                    tokStr = strtok(nullptr, " ");
+                }
+                cout << filename << " -> " << " -> " << dataSize << " -> " << data.length() << endl;
+                writeBinaryDataToFile(filename, data, dataSize);
             }
         }
 
