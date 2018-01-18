@@ -7,6 +7,7 @@
 #include <iostream>
 #include <list>
 #include <cstdio>
+#include <fstream>
 using namespace std;
 const int MAXSIZE{20000};
 list<int> client_socketFDs;
@@ -24,6 +25,16 @@ void* handleNewClientConnection(void* client_socket)
     {
         //printf("data from client: %s", messageFromClient);
         cout << messageFromClient << endl;
+        ofstream fileO{"testFile.zip", ios::out | ios::ate};
+        if (fileO.is_open())
+        {
+            cout << "Ok - O" << endl;
+            fileO.seekp(0, ios::beg);
+            fileO.write(messageFromClient, 16199);
+            fileO.close();
+        }
+        else
+            cout << "error - O" ;
         for (auto iterClient_socketFD = begin(client_socketFDs); iterClient_socketFD != end(client_socketFDs); iterClient_socketFD++)
             if (*iterClient_socketFD != client_socketFD)
                 send(*iterClient_socketFD, messageFromClient, MAXSIZE, 0);
