@@ -2,7 +2,6 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <netinet/in.h>
-#include <sys/sendfile.h>
 #include <pthread.h>
 #include <cstring>
 #include <cstdio>
