@@ -1,7 +1,7 @@
 #include "client_core.h"
 
 Client_Core::Client_Core()
-    : fileName{}, binaryData{nullptr}, message{nullptr}, dataSize{0}, clientFD{-1}, MESSAGE_SIZE{200}, RECV_MESSAGE_SIZE{200000}
+    : fileName{}, binaryData{nullptr}, send_message{nullptr}, dataSize{0}, clientFD{-1}, MESSAGE_SIZE{200}, RECV_MESSAGE_SIZE{200000}
 
 {
     clientFD = socket(AF_INET, SOCK_STREAM, 0);
@@ -27,14 +27,26 @@ void Client_Core::handleSendStream()
 {
     while (true)
     {
-        message = new char[MESSAGE_SIZE];
-        fgets(message, MESSAGE_SIZE, stdin);
-        fileName = string(message);
-        fileName.pop_back();
-        getBinaryDataFromFile();
-        cout << fileName << " : " << dataSize;
-        int send_size{send(clientFD, binaryData, dataSize, 0)};
-        delete[] message;
+        int send_size{};
+        send_message = new char[MESSAGE_SIZE];
+        fgets(send_message, MESSAGE_SIZE, stdin);
+        if (DoesClientRequestSendFile())
+        {
+            char* subString{strtok(send_message, " ")};
+            subString = strtok(nullptr, " ");
+            fileName = string(subString);
+            fileName.pop_back();
+            getBinaryDataFromFile();
+            cout << fileName << " : " << dataSize;
+            createMessageForSendFile();
+            send_size = send(clientFD, send_message_file, strlen(send_message_file), 0);
+            fgets(subString, 100, stdin);
+            send_size = send(clientFD, binaryData, dataSize, 0);
+            delete[] send_message_file;
+        }
+        else
+            send_size = send(clientFD, send_message, strlen(send_message), 0);
+        delete[] send_message;
         if (send_size <= 0)
             break;
     }
@@ -67,6 +79,23 @@ void Client_Core::getBinaryDataFromFile()
     }
     else
         printf("open failed");
+}
+
+void Client_Core::createMessageForSendFile()
+{
+    send_message_file = new char[MESSAGE_SIZE]{};
+    strcat(send_message_file, "<FILE>");
+    strcat(send_message_file, " ");
+    strcat(send_message_file, fileName.data());
+    strcat(send_message_file, " ");
+    strcat(send_message_file, std::to_string(dataSize).data());
+    cout << send_message_file;
+}
+
+bool Client_Core::DoesClientRequestSendFile()
+{
+    static const char SEND_FILE_HEADER[]{"<FILE>"};
+    return (strstr(send_message, SEND_FILE_HEADER) != nullptr ? true : false);
 }
 void Client_Core::exec()
 {

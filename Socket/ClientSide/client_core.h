@@ -7,6 +7,7 @@
 #include <cstring>
 #include <string>
 #include <cstdio>
+#include <cstdio>
 #include <fstream>
 #include <thread>
 #include <fstream>
@@ -21,7 +22,8 @@ class Client_Core
 private:
     string fileName;
     char* binaryData;
-    char* message;
+    char* send_message;
+    char* send_message_file;
     char* recv_message;
     int dataSize;
     int clientFD;
@@ -33,6 +35,9 @@ public:
     void handleSendStream();
     void handleReceiveStream();
     void getBinaryDataFromFile();
+    void createMessageForSendFile();
+    bool DoesClientRequestSendFile();
+
     void exec();
 };
 
