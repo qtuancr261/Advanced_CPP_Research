@@ -1,8 +1,10 @@
 #include <QCoreApplication>
-
+#include "client_core.h"
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
-
-    return a.exec();
+    Client_Core client;
+    client.exec();
+    std::thread myThreadS(&Client_Core::handleSendStream, &client);
+    myThreadS.join();
+    return 0;
 }
