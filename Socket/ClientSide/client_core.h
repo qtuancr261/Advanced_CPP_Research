@@ -5,14 +5,21 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cstring>
-#include <pthread.h>
+#include <string>
 #include <cstdio>
 #include <fstream>
 #include <thread>
+#include <fstream>
+#include <iostream>
+using std::ifstream;
+using std::ofstream;
+using std::ios;
+using std::cout;
+using std::string;
 class Client_Core
 {
 private:
-    char* fileName;
+    string fileName;
     char* binaryData;
     char* message;
     char* recv_message;
@@ -20,12 +27,12 @@ private:
     int clientFD;
     const int MESSAGE_SIZE;
     const int RECV_MESSAGE_SIZE;
-    std::thread threadS;
 public:
     Client_Core();
     bool connectToServer(int serverPort, const char* serverAddress) const;
     void handleSendStream();
     void handleReceiveStream();
+    void getBinaryDataFromFile();
     void exec();
 };
 
