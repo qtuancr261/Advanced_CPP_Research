@@ -21,11 +21,14 @@ class Client_Core
 {
 private:
     string fileName;
+    string fileName_recv;
     char* binaryData;
+    char* binaryData_recv;
     char* send_message;
     char* send_message_file;
     char* recv_message;
     int dataSize;
+    int dataSize_recv;
     int clientFD;
     const int MESSAGE_SIZE;
     const int RECV_MESSAGE_SIZE;
@@ -35,8 +38,10 @@ public:
     void handleSendStream();
     void handleReceiveStream();
     void getBinaryDataFromFile();
+    void writeBinaryDataFromFile();
     void createMessageForSendFile();
     bool DoesClientRequestSendFile();
+    bool DoesClientRequestRecvFile();
 
     void exec();
 };

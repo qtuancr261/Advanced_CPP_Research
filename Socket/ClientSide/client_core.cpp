@@ -37,7 +37,7 @@ void Client_Core::handleSendStream()
             fileName = string(subString);
             fileName.pop_back();
             getBinaryDataFromFile();
-            cout << fileName << " : " << dataSize;
+            //cout << fileName << " : " << dataSize;
             createMessageForSendFile();
             send_size = send(clientFD, send_message_file, strlen(send_message_file), 0);
             fgets(subString, 100, stdin);
@@ -47,6 +47,7 @@ void Client_Core::handleSendStream()
         else
             send_size = send(clientFD, send_message, strlen(send_message), 0);
         delete[] send_message;
+        //delete[] binaryData;
         if (send_size <= 0)
             break;
     }
@@ -59,7 +60,20 @@ void Client_Core::handleReceiveStream()
         recv_message = new char[RECV_MESSAGE_SIZE];
         int recv_size{recv(clientFD, recv_message, RECV_MESSAGE_SIZE, 0)};
         printf("-> %s \n", recv_message);
+        if (DoesClientRequestRecvFile())
+        {
+            char* subString{strtok(recv_message, " ")};
+            subString = strtok(nullptr, " ");
+            fileName_recv = string(subString);
+            //fileName_recv.pop_back();
+            dataSize_recv = std::stoi(string(strtok(nullptr, " ")));
+            //cout << fileName_recv << " -> " << dataSize_recv;
+            binaryData_recv = new char[dataSize_recv]{};
+            recv_size = recv(clientFD, binaryData_recv, dataSize_recv, 0);
+            writeBinaryDataFromFile();
+        }
         delete[] recv_message;
+        //delete[] binaryData_recv;
         if (recv_size == 0)
             break;
     }
@@ -81,6 +95,20 @@ void Client_Core::getBinaryDataFromFile()
         printf("open failed");
 }
 
+void Client_Core::writeBinaryDataFromFile()
+{
+    ofstream fileO{fileName_recv, ios::out | ios::ate};
+    if (fileO.is_open())
+    {
+        //cout << "Ok - O";
+        fileO.seekp(0, ios::beg);
+        fileO.write(binaryData_recv, dataSize_recv);
+        fileO.close();
+    }
+    else
+        cout << "error - O" ;
+}
+
 void Client_Core::createMessageForSendFile()
 {
     send_message_file = new char[MESSAGE_SIZE]{};
@@ -96,6 +124,12 @@ bool Client_Core::DoesClientRequestSendFile()
 {
     static const char SEND_FILE_HEADER[]{"<FILE>"};
     return (strstr(send_message, SEND_FILE_HEADER) != nullptr ? true : false);
+}
+
+bool Client_Core::DoesClientRequestRecvFile()
+{
+    static const char SEND_FILE_HEADER[]{"<FILE>"};
+    return (strstr(recv_message, SEND_FILE_HEADER) != nullptr ? true : false);
 }
 void Client_Core::exec()
 {
