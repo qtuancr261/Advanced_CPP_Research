@@ -9,7 +9,7 @@
 #include <cstdio>
 #include <fstream>
 using namespace std;
-const int MAXSIZE{20000};
+const int MAXSIZE{200000};
 list<int> client_socketFDs;
 void* handleNewClientConnection(void* client_socket)
 {
@@ -25,7 +25,7 @@ void* handleNewClientConnection(void* client_socket)
     {
         //printf("data from client: %s", messageFromClient);
         cout << messageFromClient << endl;
-        ofstream fileO{"testFile.zip", ios::out | ios::ate};
+        /*ofstream fileO{"testFile.zip", ios::out | ios::ate};
         if (fileO.is_open())
         {
             cout << "Ok - O" << endl;
@@ -34,7 +34,7 @@ void* handleNewClientConnection(void* client_socket)
             fileO.close();
         }
         else
-            cout << "error - O" ;
+            cout << "error - O" ;*/
         for (auto iterClient_socketFD = begin(client_socketFDs); iterClient_socketFD != end(client_socketFDs); iterClient_socketFD++)
             if (*iterClient_socketFD != client_socketFD)
                 send(*iterClient_socketFD, messageFromClient, MAXSIZE, 0);
@@ -77,17 +77,6 @@ int main(int argc, char *argv[])
         {
             cerr << "Cannot create a thread for new connection";
         }
-
-        /*cout << "connection accepted from client: adress " << inet_ntoa(client.sin_addr) << " port " << ntohs(client.sin_port) << " des " << client_socket << endl;
-        send(client_socket, messageFromServer, strlen(messageFromServer), 0);
-
-        if(recv(client_socket, messageFromClient, 2000, 0) > 0)
-            cout << "Received from client: " << endl;
-        send(client_socket, messageFromClient, strlen(messageFromClient), 0);
-        cout << messageFromClient << endl;
-        recv(client_socket, messageFromClient, 2000, 0);
-        send(client_socket, messageFromClient, strlen(messageFromClient), 0);
-        cout << messageFromClient << endl;*/
     }
     //int new_socket{accept(socket_desciptor, (sockaddr*)&client, (socklen_t*)&client_size)};
     //cout << strlen(message) << endl;
