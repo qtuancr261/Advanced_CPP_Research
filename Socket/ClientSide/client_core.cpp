@@ -36,13 +36,15 @@ void Client_Core::handleSendStream()
             subString = strtok(nullptr, " ");
             fileName = string(subString);
             fileName.pop_back();
-            getBinaryDataFromFile();
-            //cout << fileName << " : " << dataSize;
-            createMessageForSendFile();
-            send_size = send(clientFD, send_message_file, strlen(send_message_file), 0);
-            fgets(subString, 100, stdin);
-            send_size = send(clientFD, binaryData, dataSize, 0);
-            delete[] send_message_file;
+            send_size = 1;
+            if (getBinaryDataFromFile())
+            {
+                createMessageForSendFile();
+                send_size = send(clientFD, send_message_file, strlen(send_message_file), 0);
+                fgets(subString, 100, stdin);
+                send_size = send(clientFD, binaryData, dataSize, 0);
+                delete[] send_message_file;
+            }
         }
         else
             send_size = send(clientFD, send_message, strlen(send_message), 0);
@@ -79,7 +81,7 @@ void Client_Core::handleReceiveStream()
     }
 }
 
-void Client_Core::getBinaryDataFromFile()
+bool Client_Core::getBinaryDataFromFile()
 {
     ifstream file{fileName, ios::in | ios::ate | ios::binary};
     if (file.is_open())
@@ -90,9 +92,10 @@ void Client_Core::getBinaryDataFromFile()
         file.read(binaryData, dataSize);
         //cout << binaryDataFromFile << endl;
         file.close();
+        return true;
     }
-    else
-        printf("open failed");
+    printf("open file failed\n");
+    return false;
 }
 
 void Client_Core::writeBinaryDataFromFile()

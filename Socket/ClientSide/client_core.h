@@ -37,7 +37,7 @@ public:
     bool connectToServer(int serverPort, const char* serverAddress) const;
     void handleSendStream();
     void handleReceiveStream();
-    void getBinaryDataFromFile();
+    bool getBinaryDataFromFile();
     void writeBinaryDataFromFile();
     void createMessageForSendFile();
     bool DoesClientRequestSendFile();
