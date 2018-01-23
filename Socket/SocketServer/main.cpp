@@ -15,23 +15,29 @@ struct client_info
     int socketFD;
     string userName;
 };
-list<int> client_socketFDs;
+list<client_info> clients;
 void* handleNewClientConnection(void* client_socket)
 {
     int client_socketFD{*(int*)client_socket};
-    client_socketFDs.push_back(client_socketFD);
     // Welcome new client with a message
     char messageFromServer[]{"Welcome to chat box. Have a nice day ! \n"};
     //char replyMessageFromServer[]{"I got it"};
     send(client_socketFD, messageFromServer, strlen(messageFromServer), 0);
     // Begin receiving from client
     char messageFromClient[MAXSIZE]{};
+    recv(client_socketFD, messageFromClient, MAXSIZE, 0);
+    client_info new_client{client_socketFD, string(messageFromClient)};
+    new_client.userName.append(" send: ");
+    clients.push_back(new_client);
     while(recv(client_socketFD, messageFromClient, MAXSIZE, 0) > 0)
     {
-        printf("From client: %s \n", messageFromClient);
-        for (auto iterClient_socketFD = begin(client_socketFDs); iterClient_socketFD != end(client_socketFDs); iterClient_socketFD++)
-            if (*iterClient_socketFD != client_socketFD)
-                send(*iterClient_socketFD, messageFromClient, MAXSIZE, 0);
+        printf("From client: %s", messageFromClient);
+        for (auto iterClient = clients.begin(); iterClient != clients.end(); iterClient++)
+            if (iterClient->socketFD != client_socketFD)
+            {
+                send(iterClient->socketFD, new_client.userName.data(), strlen(new_client.userName.data()), 0);
+                send((iterClient->socketFD), messageFromClient, MAXSIZE, 0);
+            }
         //strcpy(messageFromClient, " ");
         memset(messageFromClient, 0, sizeof(messageFromClient));
     }
