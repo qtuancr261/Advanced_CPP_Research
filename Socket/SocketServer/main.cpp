@@ -10,6 +10,11 @@
 #include <fstream>
 using namespace std;
 const int MAXSIZE{200000};
+struct client_info
+{
+    int socketFD;
+    string userName;
+};
 list<int> client_socketFDs;
 void* handleNewClientConnection(void* client_socket)
 {
