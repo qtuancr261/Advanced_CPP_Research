@@ -12,6 +12,7 @@
 #include <thread>
 #include <fstream>
 #include <iostream>
+#include <QString>
 using std::ifstream;
 using std::ofstream;
 using std::ios;
@@ -20,9 +21,9 @@ using std::string;
 class Client_Core
 {
 private:
-    string userName;
-    string fileName;
-    string fileName_recv;
+    QString userName;
+    QString fileName;
+    QString fileName_recv;
     char* binaryData;
     char* binaryData_recv;
     char* send_message;
@@ -44,7 +45,7 @@ public:
     bool DoesClientRequestSendFile();
     bool DoesClientRequestRecvFile();
 
-    void exec(std::string userName);
+    void exec(QString userName);
 };
 
 #endif // CLIENT_CORE_H

@@ -25,7 +25,7 @@ bool Client_Core::connectToServer(int serverPort, const char *serverAddress) con
 
 void Client_Core::handleSendStream()
 {
-    send(clientFD, userName.data(), strlen(userName.data()), 0);
+    send(clientFD, userName.toStdString().data(), strlen(userName.toStdString().data()), 0);
     while (true)
     {
         int send_size{};
@@ -35,8 +35,8 @@ void Client_Core::handleSendStream()
         {
             char* subString{strtok(send_message, " ")};
             subString = strtok(nullptr, " ");
-            fileName = string(subString);
-            fileName.pop_back();
+            fileName = QString(subString);
+            fileName.chop(1);
             send_size = 1;
             if (getBinaryDataFromFile())
             {
@@ -65,13 +65,17 @@ void Client_Core::handleReceiveStream()
         printf("-> %s \n", recv_message);
         if (DoesClientRequestRecvFile())
         {
-            char* subString{strtok(recv_message, " ")};
-            subString = strtok(nullptr, " ");
-            fileName_recv = string(subString);
+            //char* subString{strtok(recv_message, " ")};
+            QString message(recv_message);
+            //subString = strtok(nullptr, " ");
+            //fileName_recv = QString(subString);
+            fileName_recv = message.section(" ", -2, -2);
             //fileName_recv.pop_back();
-            dataSize_recv = std::stoi(string(strtok(nullptr, " ")));
+            //dataSize_recv = std::stoi(string(strtok(nullptr, " ")));
+            dataSize_recv = message.section(" ", -1, -1).toInt();
             //cout << fileName_recv << " -> " << dataSize_recv;
             binaryData_recv = new char[dataSize_recv]{};
+            recv(clientFD, recv_message, RECV_MESSAGE_SIZE, 0);
             recv_size = recv(clientFD, binaryData_recv, dataSize_recv, 0);
             writeBinaryDataFromFile();
         }
@@ -84,7 +88,7 @@ void Client_Core::handleReceiveStream()
 
 bool Client_Core::getBinaryDataFromFile()
 {
-    ifstream file{fileName, ios::in | ios::ate | ios::binary};
+    ifstream file{fileName.toStdString(), ios::in | ios::ate | ios::binary};
     if (file.is_open())
     {
         dataSize = static_cast<int>(file.tellg());
@@ -101,7 +105,7 @@ bool Client_Core::getBinaryDataFromFile()
 
 void Client_Core::writeBinaryDataFromFile()
 {
-    ofstream fileO{fileName_recv, ios::out | ios::ate};
+    ofstream fileO{fileName_recv.toStdString(), ios::out | ios::ate};
     if (fileO.is_open())
     {
         //cout << "Ok - O";
@@ -118,7 +122,7 @@ void Client_Core::createMessageForSendFile()
     send_message_file = new char[MESSAGE_SIZE]{};
     strcat(send_message_file, "<FILE>");
     strcat(send_message_file, " ");
-    strcat(send_message_file, fileName.data());
+    strcat(send_message_file, fileName.toStdString().data());
     strcat(send_message_file, " ");
     strcat(send_message_file, std::to_string(dataSize).data());
     cout << send_message_file;
@@ -135,7 +139,7 @@ bool Client_Core::DoesClientRequestRecvFile()
     static const char SEND_FILE_HEADER[]{"<FILE>"};
     return (strstr(recv_message, SEND_FILE_HEADER) != nullptr ? true : false);
 }
-void Client_Core::exec(string userName)
+void Client_Core::exec(QString userName)
 {
     if(connectToServer(2610, "127.0.0.1"))
         printf(" -> connection successfully\n");
