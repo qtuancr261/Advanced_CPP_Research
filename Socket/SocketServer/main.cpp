@@ -8,14 +8,16 @@
 #include <list>
 #include <cstdio>
 #include <fstream>
+#include <QString>
 using namespace std;
 const int MAXSIZE{200000};
 struct client_info
 {
     int socketFD;
-    string userName;
+    QString userName;
 };
 list<client_info> clients;
+int fileFlag{2};
 void* handleNewClientConnection(void* client_socket)
 {
     int client_socketFD{*(int*)client_socket};
@@ -26,18 +28,23 @@ void* handleNewClientConnection(void* client_socket)
     // Begin receiving from client
     char messageFromClient[MAXSIZE]{};
     recv(client_socketFD, messageFromClient, MAXSIZE, 0);
-    client_info new_client{client_socketFD, string(messageFromClient)};
+    client_info new_client{client_socketFD, QString(messageFromClient)};
     new_client.userName.append(" send: ");
     clients.push_back(new_client);
     while(recv(client_socketFD, messageFromClient, MAXSIZE, 0) > 0)
     {
         printf("From client: %s", messageFromClient);
+        QString qmessageFromClient(messageFromClient);
+        if (qmessageFromClient.section(" ", 0, 0) == QString("<FILE>"))
+            fileFlag = 1;
         for (auto iterClient = clients.begin(); iterClient != clients.end(); iterClient++)
             if (iterClient->socketFD != client_socketFD)
             {
-                send(iterClient->socketFD, new_client.userName.data(), strlen(new_client.userName.data()), 0);
+                if (fileFlag != 0)
+                    send(iterClient->socketFD, new_client.userName.toStdString().data(), strlen(new_client.userName.toStdString().data()), 0);
                 send((iterClient->socketFD), messageFromClient, MAXSIZE, 0);
             }
+        fileFlag--;
         //strcpy(messageFromClient, " ");
         memset(messageFromClient, 0, sizeof(messageFromClient));
     }
