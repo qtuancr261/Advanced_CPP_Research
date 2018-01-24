@@ -20,6 +20,7 @@ using std::string;
 class Client_Core
 {
 private:
+    string userName;
     string fileName;
     string fileName_recv;
     char* binaryData;
@@ -43,7 +44,7 @@ public:
     bool DoesClientRequestSendFile();
     bool DoesClientRequestRecvFile();
 
-    void exec();
+    void exec(std::string userName);
 };
 
 #endif // CLIENT_CORE_H

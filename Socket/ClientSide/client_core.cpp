@@ -25,6 +25,7 @@ bool Client_Core::connectToServer(int serverPort, const char *serverAddress) con
 
 void Client_Core::handleSendStream()
 {
+    send(clientFD, userName.data(), strlen(userName.data()), 0);
     while (true)
     {
         int send_size{};
@@ -134,12 +135,13 @@ bool Client_Core::DoesClientRequestRecvFile()
     static const char SEND_FILE_HEADER[]{"<FILE>"};
     return (strstr(recv_message, SEND_FILE_HEADER) != nullptr ? true : false);
 }
-void Client_Core::exec()
+void Client_Core::exec(string userName)
 {
     if(connectToServer(2610, "127.0.0.1"))
         printf(" -> connection successfully\n");
     else
         printf(" -> connection failed\n");
+    this->userName = userName;
     /*pthread_t clientHandleSendThread{};
     if (pthread_create(&clientHandleSendThread, nullptr, wrapper_handlerSendStream, this) != 0)
     {
