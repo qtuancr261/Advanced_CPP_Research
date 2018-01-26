@@ -47,8 +47,8 @@ void* handleNewClientConnection(void* client_socket)
         {
             QString roomName(qmessageFromClient.section(" ", 1, 1));
             privateRooms.push_back(RoomChat(roomName));
-            //privateRooms.at(0).addAClientToRoom(publicRoom.removeAClientHasID(client_socketFD));
-            publicRoom.removeAClientHasID(client_socketFD);
+            privateRooms.at(0).addAClientToRoom(publicRoom.removeAClientHasID(client_socketFD));
+            //publicRoom.removeAClientHasID(client_socketFD);
             /*for (const auto& room : privateRooms)
             */    //printf("Room request : %s - ", room.getName().toStdString().c_str());
             break;
