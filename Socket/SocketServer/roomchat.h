@@ -32,6 +32,7 @@ public:
     void setName(const QString &value);
     vector<clientPtr>& getClientsInRoom();
     void addAClientToRoom(clientPtr client);
+    clientPtr removeAClientHasID(int id);
     MessageType specifyMessageType(const QString& message);
 };
 
