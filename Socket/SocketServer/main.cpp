@@ -10,14 +10,10 @@
 #include "roomchat.h"
 using namespace std;
 const int MAXSIZE{200000};
-struct client_info
-{
-    int socketFD;
-    QString userName;
-};
-list<client_info> clients;
+
 RoomChat publicRoom("public room");
 int fileFlag{2000};
+vector<RoomChat> privateRooms;
 void* handleNewClientConnection(void* client_socket)
 {
     int client_socketFD{*(int*)client_socket};
@@ -41,8 +37,27 @@ void* handleNewClientConnection(void* client_socket)
         printf("From client: %s", messageFromClient);
         QString qmessageFromClient(messageFromClient);
         //if (qmessageFromClient.section(" ", 0, 0) == QString("<FILE>"))
-        if (publicRoom.specifyMessageType(qmessageFromClient) == RoomChat::MessageType::FileRequest)
+        RoomChat::MessageType msgType{publicRoom.specifyMessageType(qmessageFromClient)};
+        switch (msgType)
+        {
+        case RoomChat::MessageType::FileRequest:
             fileFlag = 1;
+            break;
+        case RoomChat::MessageType::CreateRoomRequest:
+        {
+            QString roomName(qmessageFromClient.section(" ", 1, 1));
+            privateRooms.push_back(RoomChat(roomName));
+            //privateRooms.at(0).addAClientToRoom(publicRoom.removeAClientHasID(client_socketFD));
+            publicRoom.removeAClientHasID(client_socketFD);
+            /*for (const auto& room : privateRooms)
+            */    //printf("Room request : %s - ", room.getName().toStdString().c_str());
+            break;
+        }
+        default:
+            break;
+        }
+        //if (publicRoom.specifyMessageType(qmessageFromClient) == RoomChat::MessageType::FileRequest)
+        //    fileFlag = 1;
         /*for (auto iterClient = clients.begin(); iterClient != clients.end(); iterClient++)
             if (iterClient->socketFD != client_socketFD)
             {
