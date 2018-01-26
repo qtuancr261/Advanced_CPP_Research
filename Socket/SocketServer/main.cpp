@@ -17,7 +17,7 @@ struct client_info
 };
 list<client_info> clients;
 RoomChat publicRoom("public room");
-int fileFlag{2};
+int fileFlag{2000};
 void* handleNewClientConnection(void* client_socket)
 {
     int client_socketFD{*(int*)client_socket};
@@ -30,7 +30,7 @@ void* handleNewClientConnection(void* client_socket)
     recv(client_socketFD, messageFromClient, MAXSIZE, 0);
     //client_info new_client{client_socketFD, QString(messageFromClient)};
     QString clientName(messageFromClient);
-
+    clientName.append(" send: ");
     //new_client.userName.append(" send: ");
     //clients.push_back(new_client);
     //clientPtr newClient{make_unique<client>(client_socketFD, clientName)};
@@ -40,7 +40,8 @@ void* handleNewClientConnection(void* client_socket)
     {
         printf("From client: %s", messageFromClient);
         QString qmessageFromClient(messageFromClient);
-        if (qmessageFromClient.section(" ", 0, 0) == QString("<FILE>"))
+        //if (qmessageFromClient.section(" ", 0, 0) == QString("<FILE>"))
+        if (publicRoom.specifyMessageType(qmessageFromClient) == RoomChat::MessageType::FileRequest)
             fileFlag = 1;
         /*for (auto iterClient = clients.begin(); iterClient != clients.end(); iterClient++)
             if (iterClient->socketFD != client_socketFD)
