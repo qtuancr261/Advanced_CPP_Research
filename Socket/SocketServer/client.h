@@ -4,10 +4,11 @@
 #include <cstdio>
 #include <list>
 #include <QString>
+#include "roomchat.h"
 using std::list;
 using std::string;
 
-
+class RoomChat;
 class client
 {
 private:
