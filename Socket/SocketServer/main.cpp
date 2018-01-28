@@ -56,22 +56,13 @@ void* handleNewClientConnection(void* client_socket)
         default:
             break;
         }
-        //if (publicRoom.specifyMessageType(qmessageFromClient) == RoomChat::MessageType::FileRequest)
-        //    fileFlag = 1;
-        /*for (auto iterClient = clients.begin(); iterClient != clients.end(); iterClient++)
-            if (iterClient->socketFD != client_socketFD)
-            {
-                if (fileFlag != 0)
-                    send(iterClient->socketFD, new_client.userName.toStdString().data(), strlen(new_client.userName.toStdString().data()), 0);
-                send((iterClient->socketFD), messageFromClient, MAXSIZE, 0);
-            }*/
-        for (int i{}; i < publicRoom.getClientsInRoom().size(); i++)
+        for (auto& pairID_Client : publicRoom.getClientsInRoom())
         {
-            if (publicRoom.getClientsInRoom().at(i)->getId() != client_socketFD)
+            if (pairID_Client.second->getId() != client_socketFD)
             {
                 if (fileFlag != 0)
-                    send(publicRoom.getClientsInRoom().at(i)->getId(), clientName.toStdString().data(), clientName.size(), 0);
-                send(publicRoom.getClientsInRoom().at(i)->getId(), messageFromClient, MAXSIZE, 0);
+                    send(pairID_Client.second->getId(), clientName.toStdString().data(), clientName.size(), 0);
+                send(pairID_Client.second->getId(), messageFromClient, MAXSIZE, 0);
             }
         }
         fileFlag--;
@@ -79,8 +70,9 @@ void* handleNewClientConnection(void* client_socket)
         memset(messageFromClient, 0, sizeof(messageFromClient));
     }
     printf("Client disconnected\n");
+    return 0;
 }
-int main(int argc, char *argv[])
+int main()
 {
     int socket_server{socket(AF_INET, SOCK_STREAM, 0)};
     if (socket_server == -1)
