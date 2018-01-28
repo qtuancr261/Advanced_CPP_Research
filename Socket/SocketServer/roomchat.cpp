@@ -10,28 +10,21 @@ void RoomChat::setName(const QString &value)
     name = value;
 }
 
-vector<clientPtr> &RoomChat::getClientsInRoom()
+map<int, clientPtr> &RoomChat::getClientsInRoom()
 {
     return clientsInRoom;
 }
 
 void RoomChat::addAClientToRoom(clientPtr client)
 {
-    clientsInRoom.push_back(move(client));
+    clientsInRoom.insert(make_pair(client->getId(), move(client)));
 }
 
 clientPtr RoomChat::removeAClientHasID(int id)
 {
-    for (auto& client : clientsInRoom)
-    {
-        if (client->getId() == id)
-        {
-            clientPtr tempPtr{move(client)};
-            clientsInRoom.at(clientsInRoom.size() - 1).swap(client);
-            clientsInRoom.pop_back();
-            return tempPtr;
-        }
-    }
+    clientPtr matchedClient{move(clientsInRoom.at(id))};
+    clientsInRoom.erase(id);
+    return matchedClient;
 }
 
 RoomChat::MessageType RoomChat::specifyMessageType(const QString &message)
