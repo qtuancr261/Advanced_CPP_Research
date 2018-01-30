@@ -59,22 +59,42 @@ void* handleNewClientConnection(void* client_socket)
             */    //printf("Room request : %s - ", room.getName().toStdString().c_str());
             break;
         }
+        case RoomChat::MessageType::SwitchRoomRequest:
+        {
+            QString roomName{qmessageFromClient.section(" ", 1, 1)};
+            for (auto& room : privateRooms)
+            {
+                if (room->getName() == roomName)
+                {
+                    newClient->exitCurrentStayedRoom();
+                    newClient->setCurrentStayedRoom(room);
+                    room->addAClientToRoom(newClient);
+                    qDebug() << "Switch room successfully";
+                }
+            }
+            break;
+        }
         default:
             break;
         }
 
-        for (auto& pairID_Client : publicRoom->getClientsInRoom())
+        if (!newClient->getCurrentStayedRoom().expired())
         {
-            if (pairID_Client.second->getId() != client_socketFD)
+            shared_ptr<RoomChat> currentRoom{newClient->getCurrentStayedRoom().lock()};
+            for (auto& pairID_Client : currentRoom->getClientsInRoom())
             {
-                if (fileFlag != 0)
-                    send(pairID_Client.second->getId(), clientName.toStdString().data(), clientName.size(), 0);
-                send(pairID_Client.second->getId(), messageFromClient, MAXSIZE, 0);
+                if (pairID_Client.second->getId() != client_socketFD)
+                {
+                    if (fileFlag != 0)
+                        send(pairID_Client.second->getId(), clientName.toStdString().data(), clientName.size(), 0);
+                    send(pairID_Client.second->getId(), messageFromClient, MAXSIZE, 0);
+                }
             }
+            fileFlag--;
+            //strcpy(messageFromClient, " ");
+            memset(messageFromClient, 0, sizeof(messageFromClient));
         }
-        fileFlag--;
-        //strcpy(messageFromClient, " ");
-        memset(messageFromClient, 0, sizeof(messageFromClient));
+
     }
     printf("Client disconnected\n");
     return 0;
