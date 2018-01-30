@@ -35,6 +35,8 @@ RoomChat::MessageType RoomChat::specifyMessageType(const QString &message)
         return MessageType::FileRequest;
     if (header == QString("<CREATE_ROOM>"))
         return MessageType::CreateRoomRequest;
+    if (header == QString("<JOIN_ROOM>"))
+        return MessageType::SwitchRoomRequest;
     if (header == QString("<EXIT>"))
         return MessageType::ExitRoomRequest;
     return
