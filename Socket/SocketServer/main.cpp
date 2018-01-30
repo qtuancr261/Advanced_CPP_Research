@@ -11,9 +11,9 @@
 using namespace std;
 const int MAXSIZE{200000};
 
-RoomChat publicRoom("public room");
+shared_ptr<RoomChat> publicRoom{make_shared<RoomChat>("public room")};
 int fileFlag{2000};
-vector<RoomChat> privateRooms;
+vector<shared_ptr<RoomChat>> privateRooms;
 void* handleNewClientConnection(void* client_socket)
 {
     int client_socketFD{*(int*)client_socket};
@@ -31,13 +31,15 @@ void* handleNewClientConnection(void* client_socket)
     //clients.push_back(new_client);
     //clientPtr newClient{make_unique<client>(client_socketFD, clientName)};
     //publicRoom.addAClientToRoom(move(newClient));
-    publicRoom.addAClientToRoom(make_unique<client>(client_socketFD, clientName));
+    clientPtr newClient{make_shared<client>(client_socketFD, clientName)};
+    publicRoom->addAClientToRoom(newClient);
+    newClient->setCurrentStayedRoom(publicRoom);
     while(recv(client_socketFD, messageFromClient, MAXSIZE, 0) > 0)
     {
         printf("From client: %s", messageFromClient);
         QString qmessageFromClient(messageFromClient);
         //if (qmessageFromClient.section(" ", 0, 0) == QString("<FILE>"))
-        RoomChat::MessageType msgType{publicRoom.specifyMessageType(qmessageFromClient)};
+        RoomChat::MessageType msgType{publicRoom->specifyMessageType(qmessageFromClient)};
         switch (msgType)
         {
         case RoomChat::MessageType::FileRequest:
@@ -46,8 +48,12 @@ void* handleNewClientConnection(void* client_socket)
         case RoomChat::MessageType::CreateRoomRequest:
         {
             QString roomName(qmessageFromClient.section(" ", 1, 1));
-            privateRooms.push_back(RoomChat(roomName));
-            privateRooms.at(0).addAClientToRoom(publicRoom.removeAClientHasID(client_socketFD));
+            // Create a new private room as request
+            shared_ptr<RoomChat> newPrivateRoom{make_shared<RoomChat>(roomName)};
+            privateRooms.push_back(newPrivateRoom);
+            newClient->exitCurrentStayedRoom();
+            newClient->setCurrentStayedRoom(newPrivateRoom);
+            newPrivateRoom->addAClientToRoom(newClient);
             //publicRoom.removeAClientHasID(client_socketFD);
             /*for (const auto& room : privateRooms)
             */    //printf("Room request : %s - ", room.getName().toStdString().c_str());
@@ -56,7 +62,8 @@ void* handleNewClientConnection(void* client_socket)
         default:
             break;
         }
-        for (auto& pairID_Client : publicRoom.getClientsInRoom())
+
+        for (auto& pairID_Client : publicRoom->getClientsInRoom())
         {
             if (pairID_Client.second->getId() != client_socketFD)
             {
