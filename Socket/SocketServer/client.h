@@ -4,6 +4,8 @@
 #include <cstdio>
 #include <list>
 #include <QString>
+#include <QtDebug>
+#include <memory>
 #include "roomchat.h"
 using std::list;
 using std::string;
@@ -25,6 +27,8 @@ public:
     void setName(const QString &value);
     weak_ptr<RoomChat>& getCurrentStayedRoom();
     void setCurrentStayedRoom(const shared_ptr<RoomChat> &value);
+    void exitCurrentStayedRoom();
+    ~client();
 };
 
 #endif // CLIENT_H
