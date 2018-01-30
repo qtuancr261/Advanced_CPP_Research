@@ -43,6 +43,7 @@ public:
     void addAClientToRoom(clientPtr& client);
     void removeAClientHasID(int id);
     MessageType specifyMessageType(const QString& message);
+    ~RoomChat();
 };
 
 #endif // ROOMCHAT_H

@@ -42,6 +42,11 @@ RoomChat::MessageType RoomChat::specifyMessageType(const QString &message)
     return
             MessageType::Normal;
 }
+
+RoomChat::~RoomChat()
+{
+    qDebug() << "a room has been deleted";
+}
 RoomChat::RoomChat(QString defName)
     : name{defName}
 {
