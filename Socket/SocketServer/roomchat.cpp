@@ -15,16 +15,17 @@ map<int, clientPtr> &RoomChat::getClientsInRoom()
     return clientsInRoom;
 }
 
-void RoomChat::addAClientToRoom(clientPtr client)
+void RoomChat::addAClientToRoom(clientPtr &client)
 {
-    clientsInRoom.insert(make_pair(client->getId(), move(client)));
+    int fd{client->getId()};
+    clientsInRoom.insert(make_pair(fd, client));
+    //clientsInRoom.at(fd)->setCurrentStayedRoom(shared_ptr<RoomChat>(this));
 }
 
-clientPtr RoomChat::removeAClientHasID(int id)
+void RoomChat::removeAClientHasID(int id)
 {
-    clientPtr matchedClient{move(clientsInRoom.at(id))};
+    clientsInRoom.at(id).reset();
     clientsInRoom.erase(id);
-    return matchedClient;
 }
 
 RoomChat::MessageType RoomChat::specifyMessageType(const QString &message)

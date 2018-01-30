@@ -9,11 +9,12 @@ class client;
 using std::vector;
 using std::map;
 using std::unique_ptr;
+using std::shared_ptr;
 using std::pair;
 using std::make_unique;
 using std::make_pair;
 using std::move;
-using clientPtr = unique_ptr<client>;
+using clientPtr = shared_ptr<client>;
 
 
 class RoomChat
@@ -39,8 +40,8 @@ public:
     QString getName() const;
     void setName(const QString &value);
     map<int, clientPtr>& getClientsInRoom();
-    void addAClientToRoom(clientPtr client);
-    clientPtr removeAClientHasID(int id);
+    void addAClientToRoom(clientPtr& client);
+    void removeAClientHasID(int id);
     MessageType specifyMessageType(const QString& message);
 };
 
