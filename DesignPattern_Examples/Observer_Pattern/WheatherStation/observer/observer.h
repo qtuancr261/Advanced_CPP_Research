@@ -2,6 +2,6 @@
 #define OBSERVER_H
 class Observer
 {
-    virtual void update() = 0;
+    virtual void update(double temperature, double humidity, double pressure) = 0;
 };
 #endif // OBSERVER_H
