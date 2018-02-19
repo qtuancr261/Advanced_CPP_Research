@@ -15,7 +15,7 @@ void WeatherData::removeObserver(const ObserverPtr& anObserver)
     observers.remove(anObserver);
 }
 
-void WeatherData::notifyAllObserver() const
+void WeatherData::notifyAllObservers() const
 {
     for (auto& observer : observers)
     {

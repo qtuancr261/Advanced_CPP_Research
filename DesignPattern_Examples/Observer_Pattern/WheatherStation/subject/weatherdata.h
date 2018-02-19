@@ -16,7 +16,8 @@ public:
     WeatherData();
     virtual void registerObserver(const ObserverPtr& newObserver) override;
     virtual void removeObserver(const ObserverPtr& anObserver) override;
-    virtual void notifyAllObserver() const override;
+    virtual void notifyAllObservers() const override;
+    void measurementsChanged();
 };
 
 #endif // WEATHERDATA_H
