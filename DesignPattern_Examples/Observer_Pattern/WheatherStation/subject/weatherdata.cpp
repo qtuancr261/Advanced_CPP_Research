@@ -2,7 +2,7 @@
 
 WeatherData::WeatherData()
 {
-
+    QObject::connect(this, &WeatherData::measurementsChanged, this, &WeatherData::notifyAllObservers);
 }
 
 void WeatherData::registerObserver(const ObserverPtr& newObserver)
@@ -17,8 +17,17 @@ void WeatherData::removeObserver(const ObserverPtr& anObserver)
 
 void WeatherData::notifyAllObservers() const
 {
+    qDebug() << "signal - slot";
     for (auto& observer : observers)
     {
         observer->update(temperature, humidity, pressure);
     }
+}
+
+void WeatherData::setMeasurements(double temperature, double pressure, double humidity)
+{
+    this->temperature = temperature;
+    this->pressure = pressure;
+    this->humidity = humidity;
+    emit measurementsChanged();
 }
