@@ -1,6 +1,7 @@
 #include "harddiskdrive.h"
 
-HardDiskDrive::HardDiskDrive()
+HardDiskDrive::HardDiskDrive(int id, std::string name)
+    : StorageDevice{id, name}
 {
 
 }

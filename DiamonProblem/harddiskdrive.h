@@ -1,11 +1,11 @@
 #ifndef HARDDISKDRIVE_H
 #define HARDDISKDRIVE_H
+#include "storagedevice.h"
 
-
-class HardDiskDrive
+class HardDiskDrive : public virtual StorageDevice
 {
 public:
-    HardDiskDrive();
+    explicit HardDiskDrive(int id = 0, string name = "device");
 };
 
 #endif // HARDDISKDRIVE_H
