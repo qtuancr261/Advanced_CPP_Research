@@ -24,11 +24,6 @@ void WeatherData::notifyAllObservers() const
     }
 }
 
-WeatherData::~WeatherData()
-{
-    qDebug() << "WeatherData has been deleted ";
-}
-
 void WeatherData::setMeasurements(double temperature, double pressure, double humidity)
 {
     this->temperature = temperature;
