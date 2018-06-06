@@ -1,6 +1,7 @@
 #include "solidstatedrive.h"
 
-SolidStateDrive::SolidStateDrive()
+SolidStateDrive::SolidStateDrive(int id, std::string name)
+    : StorageDevice{id, name}
 {
 
 }
