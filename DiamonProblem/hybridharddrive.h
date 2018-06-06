@@ -6,7 +6,7 @@
 class HybridHardDrive : public HardDiskDrive, public SolidStateDrive
 {
 public:
-    HybridHardDrive();
+    explicit HybridHardDrive(int id = 0, string name = "device");
 };
 
 #endif // HYBRIDHARDDRIVE_H

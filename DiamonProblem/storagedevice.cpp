@@ -3,7 +3,7 @@
 StorageDevice::StorageDevice(int id, std::string name)
     : id{id}, name{name}
 {
-
+    qDebug() << "StorageDevide Constructor";
 }
 
 int StorageDevice::getId() const

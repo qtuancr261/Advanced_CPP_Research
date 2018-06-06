@@ -1,6 +1,7 @@
 #ifndef STORAGEDEVICE_H
 #define STORAGEDEVICE_H
 #include <string>
+#include <QtDebug>
 using std::string;
 class StorageDevice
 {

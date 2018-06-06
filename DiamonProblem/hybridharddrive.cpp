@@ -1,6 +1,7 @@
 #include "hybridharddrive.h"
 
-HybridHardDrive::HybridHardDrive()
+HybridHardDrive::HybridHardDrive(int id, std::string name)
+    : StorageDevice{id, name}, HardDiskDrive{}, SolidStateDrive{}
 {
 
 }
