@@ -16,3 +16,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp
+
+unix:!macx: LIBS += -L$$PWD/../build-ThreadGuard-Desktop_Qt_5_9_6_GCC_64bit2-Debug/ -lThreadGuard
+
+INCLUDEPATH += $$PWD/../ThreadGuard
+DEPENDPATH += $$PWD/../ThreadGuard
+
+unix:!macx: PRE_TARGETDEPS += $$PWD/../build-ThreadGuard-Desktop_Qt_5_9_6_GCC_64bit2-Debug/libThreadGuard.a
