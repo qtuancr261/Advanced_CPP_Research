@@ -61,7 +61,7 @@ void Client_Core::handleReceiveStream()
     while (true)
     {
         recv_message = new char[RECV_MESSAGE_SIZE];
-        int recv_size{recv(clientFD, recv_message, RECV_MESSAGE_SIZE, 0)};
+        int recv_size{static_cast<int>(recv(clientFD, recv_message, RECV_MESSAGE_SIZE, 0))};
         printf("-> %s \n", recv_message);
         if (DoesClientRequestRecvFile())
         {
