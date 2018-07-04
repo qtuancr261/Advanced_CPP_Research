@@ -45,5 +45,4 @@ public:
     MessageType specifyMessageType(const QString& message);
     ~RoomChat();
 };
-
 #endif // ROOMCHAT_H
