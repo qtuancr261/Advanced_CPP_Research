@@ -2,11 +2,11 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include <pthread.h>
 #include <cstring>
 #include <iostream>
 #include <list>
 #include <fstream>
+#include <thread>
 #include "roomchat.h"
 using namespace std;
 const int MAXSIZE{200000};
@@ -128,12 +128,14 @@ int main()
             continue;
         }
         printf("connection accepted from client: adress %s port %d des %d \n", inet_ntoa(client.sin_addr), ntohs(client.sin_port), client_socket);
-        pthread_t serverHandlerThread{};
+        //pthread_t serverHandlerThread{};
         int* ptrClient_socket{new int{client_socket}};
-        if (pthread_create(&serverHandlerThread, nullptr, handleNewClientConnection, (void*)ptrClient_socket) < 0)
+        /*if (pthread_create(&serverHandlerThread, nullptr, handleNewClientConnection, (void*)ptrClient_socket) < 0)
         {
             printf("Cannot create a thread for new connection");
-        }
+        }*/
+        thread serverHandlerThread{handleNewClientConnection, (void*)ptrClient_socket};
+        serverHandlerThread.detach();
     }
     //int new_socket{accept(socket_desciptor, (sockaddr*)&client, (socklen_t*)&client_size)};
     //cout << strlen(message) << endl;
