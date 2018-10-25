@@ -1,3 +1,4 @@
+
 #ifndef CLIENT_H
 #define CLIENT_H
 
@@ -7,7 +8,7 @@
 #include <QString>
 #include <QtDebug>
 #include <memory>
-#include "roomchat.h"
+
 using std::list;
 using std::string;
 using std::weak_ptr;

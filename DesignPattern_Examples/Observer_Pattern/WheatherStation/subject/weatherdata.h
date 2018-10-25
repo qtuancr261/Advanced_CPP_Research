@@ -19,6 +19,7 @@ public:
     virtual void registerObserver(const ObserverPtr& newObserver) override;
     virtual void removeObserver(const ObserverPtr& anObserver) override;
     virtual void notifyAllObservers() const override;
+    virtual ~WeatherData();
 signals:
     void measurementsChanged();
 

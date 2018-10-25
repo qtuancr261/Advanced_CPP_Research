@@ -139,7 +139,7 @@ bool Client_Core::DoesClientRequestRecvFile()
     static const char SEND_FILE_HEADER[]{"<FILE>"};
     return (strstr(recv_message, SEND_FILE_HEADER) != nullptr ? true : false);
 }
-void Client_Core::exec(QString userName)
+void Client_Core::setClientName(QString userName)
 {
     if(connectToServer(2610, "127.0.0.1"))
         printf(" -> connection successfully\n");

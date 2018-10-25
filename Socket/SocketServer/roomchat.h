@@ -1,5 +1,6 @@
 #ifndef ROOMCHAT_H
 #define ROOMCHAT_H
+
 #include "client.h"
 #include <memory>
 #include <vector>

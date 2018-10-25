@@ -1,5 +1,5 @@
 #include "client.h"
-
+#include "roomchat.h"
 weak_ptr<RoomChat> &client::getCurrentStayedRoom()
 {
     return currentStayedRoom;

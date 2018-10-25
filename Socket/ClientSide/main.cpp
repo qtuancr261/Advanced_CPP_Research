@@ -1,14 +1,18 @@
 #include <QCoreApplication>
 #include "client_core.h"
+using std::endl;
 int main(int argc, char *argv[])
 {
     Client_Core client;
-    for (int i{}; i < argc; i++)
-        std::printf(argv[i]);
-    client.exec(QString(argv[1]));
-    std::thread myThreadS(&Client_Core::handleSendStream, &client);
-    std::thread myThreadR(&Client_Core::handleReceiveStream, &client);
-    myThreadS.join();
-    myThreadR.join();
+    if (argc < 2)
+    {
+        cout << "You must provide a name to join our server" << endl;
+        return 1;
+    }
+    client.setClientName(QString(argv[1]));
+    std::thread clientSendThread(&Client_Core::handleSendStream, &client);
+    std::thread clientReceiveThread(&Client_Core::handleReceiveStream, &client);
+    clientReceiveThread.join();
+    clientSendThread.join();
     return 0;
 }

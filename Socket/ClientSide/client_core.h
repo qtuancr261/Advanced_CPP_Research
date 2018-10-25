@@ -45,7 +45,7 @@ public:
     bool DoesClientRequestSendFile();
     bool DoesClientRequestRecvFile();
 
-    void exec(QString userName);
+    void setClientName(QString userName);
 };
 
 #endif // CLIENT_CORE_H
