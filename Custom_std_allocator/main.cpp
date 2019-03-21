@@ -1,9 +1,14 @@
+#include "poolallocator.h"
 #include <iostream>
-
-using namespace std;
-
+#include <set>
+using std::cout;
+using std::endl;
+using std::set;
+using EventSentHolder = set<long, std::less<long>, pool_allocator<long>>;
 int main()
 {
-    cout << "Hello World!" << endl;
+    EventSentHolder _eventSent;
+    _eventSent.insert(1);
+    _eventSent.insert(2);
     return 0;
 }
