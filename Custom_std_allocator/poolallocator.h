@@ -70,6 +70,7 @@ public:
 
     ~pool_allocator()
     {
+        std::cout << "Release all " << _base.size() << std::endl;
         element<T>* chunk;
         while (!_base.empty()) {
             chunk = _base.front();
@@ -115,6 +116,7 @@ public:
         // unlink free
         element<T>* allocElement = _freeHead;
         _freeHead = _freeHead->ptrNext;
+        allocElement->ptrNext = nullptr;
         if (_freeHead == nullptr) {
             _freeTail = nullptr;
         }
