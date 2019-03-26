@@ -8,8 +8,7 @@ using EventSentHolder = set<long, std::less<long>, pool_allocator<long>>;
 int main()
 {
     EventSentHolder _eventSent;
-    for (int var = 0; var < 1000000; ++var) {
-        _eventSent.insert(var);
-    }
+    _eventSent.insert(10);
+    _eventSent.insert(20);
     return 0;
 }
