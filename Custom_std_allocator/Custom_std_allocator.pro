@@ -7,4 +7,5 @@ SOURCES += \
         main.cpp
 
 HEADERS += \
-    poolallocator.h
+    poolallocator.h \
+    minimalpoolalloc.h
