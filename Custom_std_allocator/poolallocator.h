@@ -98,7 +98,8 @@ public:
             std::__throw_bad_alloc();
         // return static_cast<T*> (::operator new(__n * sizeof (T)));
         // create new chunk
-        if (_freeHead == nullptr && _freeTail == nullptr) {
+        if (_freeHead == nullptr && _freeTail == nullptr)
+        {
             element<T>* newChunk = (element<T>*)malloc(N_SLOT * sizeof(element<T>));
             std::cout << " size eleT " << sizeof(element<T>) << "size T " << sizeof(T) << std::endl;
             _base.push_back(newChunk);
