@@ -10,5 +10,6 @@ int main()
     EventSentHolder _eventSent;
     _eventSent.insert(10);
     _eventSent.insert(20);
+    cout << "size of char : " << sizeof(char) << endl;
     return 0;
 }
