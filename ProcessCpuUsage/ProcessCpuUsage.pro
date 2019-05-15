@@ -5,7 +5,13 @@ CONFIG -= qt
 
 SOURCES += \
         main.cpp \
-    processutil.cpp
+    processutil.cpp \
+    CPUClock.cpp
 
 HEADERS += \
-    processutil.h
+    processutil.h \
+    CPUClock.h
+
+# zpoco lib
+INCLUDEPATH += ./zpoco/inc
+LIBS += ../zpoco/lib/libzpoco.a
