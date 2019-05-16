@@ -26,6 +26,7 @@ void ProcessUtil::ReadProcStat(int& procTime, int pid) {
            &(pinfo.utime),
            &(pinfo.stime));
     fclose(fp);
+    printf("Process: %s | State : %c \n", pinfo.exName, pinfo.state);
     procTime = pinfo.utime + pinfo.stime;
 }
 void ProcessUtil::ReadCpuStat(int& totalTime) {

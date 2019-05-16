@@ -1,10 +1,11 @@
 #include "CPUClock.h"
 #include "processutil.h"
+#include <iostream>
 using namespace std;
 
 int main(int argc, char* argv[]) {
     if (argc != 3) {
-        // cout << "./Bin processID traceTimeInSec";
+        cout << "./Bin processID traceTimeInSec";
         return 0;
     }
     int pid = atoi(argv[1]);
@@ -16,10 +17,10 @@ int main(int argc, char* argv[]) {
     while (clock.elapsedSec() <= durationInSec) {
         double currentCPUUsage = ProcessUtil::GetCpuUsage(pid);
         if (count > 0) total += currentCPUUsage;
-        // cout << " Process " << pid << " " << currentCPUUsage << endl;
+        cout << "-> PID: " << pid << "| CPU Usage: " << currentCPUUsage << endl;
         count++;
         sleep(1);
     }
-    // cout << "Average : " << total / durationInSec << " %" << endl;
+    cout << "Average : " << total / durationInSec << " %" << endl;
     return 0;
 }
