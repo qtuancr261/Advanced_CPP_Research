@@ -22,5 +22,6 @@ int main(int argc, char* argv[]) {
         sleep(1);
     }
     cout << "Average : " << total / durationInSec << " %" << endl;
+    cout << "ABC" + 1 << endl;
     return 0;
 }
