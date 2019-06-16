@@ -4,5 +4,11 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-        main.cpp
+        main.cpp \
+        threadguard.cpp \
+        worker.cpp
 LIBS += -lpthread
+
+HEADERS += \
+    threadguard.h \
+    worker.h
