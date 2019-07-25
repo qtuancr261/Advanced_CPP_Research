@@ -1,34 +1,37 @@
+#include <arpa/inet.h>  // for inet_addr() function
 #include <sys/socket.h>
-#include <arpa/inet.h> // for inet_addr() function
 #include <unistd.h>
 #include <cstdio>
-#include <iostream>
 #include <cstring>
+#include <iostream>
 // Basic example for socket programming on linux
 // Create a socket
 // Connect to remote server
 // Send some data
 // Receive some data
 using namespace std;
-int main(int argc, char *argv[])
-{
+int main(int argc, char* argv[]) {
     // Firstly, we must create a socket
     int socket_desc;
     socket_desc = socket(AF_INET, SOCK_STREAM, 0);
     // AF_INET stands for Address family IP ver 4
     // SOCK_STREAM means TCP protocol
-    if (socket_desc == -1)
-    {
+    if (socket_desc == -1) {
         cout << "Cannot create socket" << endl;
         exit(1);
     }
 
     // Indicate a server with ip address and port number to connect
     sockaddr_in server;
-    server.sin_addr.s_addr = inet_addr("192.168.0.1");
+    server.sin_addr.s_addr = inet_addr("127.0.0.1");
+    // server.sin_addr.s_addr = INADDR_ANY;
     server.sin_family = AF_INET;
-    server.sin_port = htons(80);
+    server.sin_port = htons(11007);
 
+    if (bind(socket_desc, (sockaddr*)(&server), sizeof(server)) < 0) {
+        cerr << "bind failed";
+        exit(1);
+    }
     // connect to a server
     if (connect(socket_desc, (sockaddr*)&server, sizeof(server)) < 0)
         cout << "Error" << endl;
