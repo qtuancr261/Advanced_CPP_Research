@@ -1,0 +1,12 @@
+--------------------------------------------------------------------------------------
+Linux Socket Server - Client brief tutorial
+--------------------------------------------------------------------------------------
+//// (* ref: https://www.bogotobogo.com/cplusplus/sockets_server_client.php *) ///////
+Server Socket:
+ 1. create a socket - get file descriptor 
+ 2. bind the socket to an address  - What port am i on ? 
+ 3. listen on a port and wait for a connection to be established
+ 4. accept the connection from a client
+ 5. send/recv - the same way as write/read for a file 
+ 6. shutdown to end read/write
+ 7. close to releases data
