@@ -29,7 +29,7 @@ int main() {
     int i = 9000;
     funct F1(i);
     thread thread_3{F1};
-    // thread_3.join();
+    // instead of use thread_3.join();
     ThreadGuard guard1{thread_3};
     return 0;
 }
