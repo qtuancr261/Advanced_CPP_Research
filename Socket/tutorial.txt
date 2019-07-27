@@ -1,7 +1,11 @@
---------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------
 Linux Socket Server - Client brief tutorial
---------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------
 //// (* ref: https://www.bogotobogo.com/cplusplus/sockets_server_client.php *) ///////
+------------------------------------------------------------------------------------------------------------------------------------
+TCP: reliable  two-way communication
+UDP: unreliable one-way only communication, not a real connection, just a basic method for sending data from one to another 
+------------------------------------------------------------------------------------------------------------------------------------
 Server Socket:
  1. create a socket - get file descriptor 
  2. bind the socket to an address  - What port am i on ? 
@@ -10,3 +14,10 @@ Server Socket:
  5. send/recv - the same way as write/read for a file 
  6. shutdown to end read/write
  7. close to releases data
+Client Soket:
+ 1. create a socket
+ 2. bind* (client doesn't need it)
+ 3. connect to a server
+ 4. send/recv - repeate until we have receive data
+ 5. shutdown to end read/write
+ 6. close to releases data
