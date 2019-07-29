@@ -6,8 +6,13 @@ Linux Socket Server - Client brief tutorial
 TCP: reliable  two-way communication
 UDP: unreliable one-way only communication, not a real connection, just a basic method for sending data from one to another 
 ------------------------------------------------------------------------------------------------------------------------------------
+Headers:
+ - <sys/socket.h> basic socket functions
+ - <arpa/inet.h> internet operation
+ - <netinet/in.h> internet protocol family 
 Server Socket:
  1. create a socket - get file descriptor 
+	
  2. bind the socket to an address  - What port am i on ? 
  3. listen on a port and wait for a connection to be established
  4. accept the connection from a client
