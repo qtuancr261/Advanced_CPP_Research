@@ -1,4 +1,5 @@
 #include <arpa/inet.h>  // for inet_addr() function
+#include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <cstdio>
@@ -12,23 +13,27 @@ int createTCPSocketV6() { return socket(AF_INET6, SOCK_STREAM, 0); }
 int createUDPSocketV4() { return socket(AF_INET, SOCK_DGRAM, 0); }
 int createUDPSocketV6() { return socket(AF_INET6, SOCK_DGRAM, 0); }
 
-bool establishBasicServer(const char* address, uint16_t port) {
+bool establishBasicServer(uint16_t port) {
     int sock_server = createTCPSocketV4();
-    if (sock_server == -1) {
+    if (sock_server < 0) {
         cerr << "Couldn't create socket ";
         return false;
     }
 
     // prepare server info (address + port)
-    sockaddr_in serverInfo;
-    serverInfo.sin_addr.s_addr = inet_addr(address);
+    sockaddr_in serverInfo{};
+    serverInfo.sin_addr.s_addr = INADDR_ANY;
     serverInfo.sin_port = htons(port);
     serverInfo.sin_family = AF_INET;
     // bind the created socket to an address + port
-    if (!bind(sock_server, (sockaddr*)(&serverInfo), 0)) {
-        cerr << "Could bind server info to socket " << sock_server;
+    if (bind(sock_server, (sockaddr*)(&serverInfo), sizeof(serverInfo)) < 0) {
+        cerr << "Couldn't bind server info to socket " << sock_server;
         return false;
     }
+
+    int sock_incomingClient{};
+    listen(sock_server, 10);
+
     return true;
 }
 int main(int argc, char* argv[]) {
@@ -36,10 +41,14 @@ int main(int argc, char* argv[]) {
         cout << argv[i] << endl;
     }
 
-    if (!establishBasicServer("127.0.0.1", 11000)) {
+    if (!establishBasicServer(2610)) {
         cerr << "Failed to establish server";
     } else {
         cout << "Establised server successfully ";
+        sleep(5);
+        while (true) {
+            sleep(1);
+        }
     }
     //        ;
     //    // Firstly, we must create a socket
