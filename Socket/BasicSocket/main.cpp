@@ -32,8 +32,24 @@ bool establishBasicServer(uint16_t port) {
     }
 
     int sock_incomingClient{};
-    listen(sock_server, 10);
 
+    if (listen(sock_server, 3) < 0) {
+        cerr << "Couldn't listen to prepare incoming connection ";
+        return false;
+    }
+
+    sockaddr_in clientInfo{};
+    int clientLen{sizeof(sockaddr_in)};
+    int sock_client{};
+    while (sock_client <= 0) {
+        sock_client = accept(sock_client, (sockaddr*)(&clientInfo), (socklen_t*)(&clientLen));
+        if (sock_client > 0) {
+            cout << "Incoming connection from address " << inet_ntoa(clientInfo.sin_addr) << " port " << ntohs(clientInfo.sin_port) << endl;
+            return true;
+        } else {
+            cout << "Waiting ..." << endl;
+        }
+    }
     return true;
 }
 int main(int argc, char* argv[]) {
@@ -45,10 +61,6 @@ int main(int argc, char* argv[]) {
         cerr << "Failed to establish server";
     } else {
         cout << "Establised server successfully ";
-        sleep(5);
-        while (true) {
-            sleep(1);
-        }
     }
     //        ;
     //    // Firstly, we must create a socket
