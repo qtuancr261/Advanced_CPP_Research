@@ -7,17 +7,17 @@
 #include <iostream>
 
 using namespace std;
-
+const string welcomeMsg{"Hello client !"};
 int createTCPSocketV4() { return socket(AF_INET, SOCK_STREAM, 0); }
 int createTCPSocketV6() { return socket(AF_INET6, SOCK_STREAM, 0); }
 int createUDPSocketV4() { return socket(AF_INET, SOCK_DGRAM, 0); }
 int createUDPSocketV6() { return socket(AF_INET6, SOCK_DGRAM, 0); }
 
-bool establishBasicServer(uint16_t port) {
-    int sock_server = createTCPSocketV4();
+void establishBasicServer(uint16_t port) {
+    int sock_server{createTCPSocketV4()};
     if (sock_server < 0) {
-        cerr << "Couldn't create socket ";
-        return false;
+        printf("Couldn't create socket \n");
+        exit(1);
     }
 
     // prepare server info (address + port)
@@ -27,30 +27,28 @@ bool establishBasicServer(uint16_t port) {
     serverInfo.sin_family = AF_INET;
     // bind the created socket to an address + port
     if (bind(sock_server, (sockaddr*)(&serverInfo), sizeof(serverInfo)) < 0) {
-        cerr << "Couldn't bind server info to socket " << sock_server;
-        return false;
+        printf("Couldn't bind server info to socket %d", sock_server);
+        exit(1);
     }
 
-    int sock_incomingClient{};
-
-    if (listen(sock_server, 3) < 0) {
-        cerr << "Couldn't listen to prepare incoming connection ";
-        return false;
+    if (listen(sock_server, 5) < 0) {
+        printf("Couldn't listen to prepare incoming connection ");
+        exit(1);
     }
+
+    printf("\nWaiting for connection \n");
 
     sockaddr_in clientInfo{};
     int clientLen{sizeof(sockaddr_in)};
     int sock_client{};
-    while (sock_client <= 0) {
-        sock_client = accept(sock_client, (sockaddr*)(&clientInfo), (socklen_t*)(&clientLen));
-        if (sock_client > 0) {
-            cout << "Incoming connection from address " << inet_ntoa(clientInfo.sin_addr) << " port " << ntohs(clientInfo.sin_port) << endl;
-            return true;
-        } else {
-            cout << "Waiting ..." << endl;
+    while (true) {
+        sock_client = accept(sock_server, (sockaddr*)(&clientInfo), (socklen_t*)(&clientLen));
+        if (sock_client <= 0) {
+            continue;
         }
+        cout << "Incoming connection from address " << inet_ntoa(clientInfo.sin_addr) << " port " << ntohs(clientInfo.sin_port) << endl;
+        write(sock_client, welcomeMsg.c_str(), welcomeMsg.size());
     }
-    return true;
 }
 int main(int argc, char* argv[]) {
     for (int i = 0; i < argc; i++) {
