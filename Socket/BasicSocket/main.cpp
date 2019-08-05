@@ -13,7 +13,7 @@ int createTCPSocketV6() { return socket(AF_INET6, SOCK_STREAM, 0); }
 int createUDPSocketV4() { return socket(AF_INET, SOCK_DGRAM, 0); }
 int createUDPSocketV6() { return socket(AF_INET6, SOCK_DGRAM, 0); }
 
-[[noreturn]] void establishBasicServer(uint16_t port) {
+void establishBasicServer(uint16_t port) {
     int sock_server{createTCPSocketV4()};
     if (sock_server < 0) {
         cerr << "Couldn't create socket";
@@ -51,7 +51,7 @@ int createUDPSocketV6() { return socket(AF_INET6, SOCK_DGRAM, 0); }
     }
 }
 
-[[noreturn]] void establishBasicClient(const char* host, uint16_t port) {
+void establishBasicClient(const char* host, uint16_t port) {
     int sock_client{createTCPSocketV4()};
     if (sock_client < 0) {
         cerr << "Couldn't create socket \n";
@@ -62,12 +62,27 @@ int createUDPSocketV6() { return socket(AF_INET6, SOCK_DGRAM, 0); }
     serverInfo.sin_addr.s_addr = inet_addr(host);
     serverInfo.sin_family = AF_INET;
     serverInfo.sin_port = htons(port);
+
+    char bufMsg[20]{};
+    if (connect(sock_client, (sockaddr*)&serverInfo, sizeof(sockaddr_in)) == 0) {
+        cout << "Connecting successfully " << endl;
+        read(sock_client, bufMsg, 20);
+        cout << bufMsg << endl;
+    }
+    close(sock_client);
 }
 int main(int argc, char* argv[]) {
     for (int i = 0; i < argc; i++) {
         cout << argv[i] << endl;
     }
+    if (argc == 1) {
+        cout << "Usage: \n-> ./executableFile server port \n-> ./executableFile client port " << endl;
 
-    establishBasicServer(2610);
+    } else if (string(argv[1]) == "server") {
+        establishBasicServer(2610);
+    } else if (string(argv[1]) == "client") {
+        establishBasicClient("127.0.0.1", 2610);
+    }
+
     return 0;
 }
