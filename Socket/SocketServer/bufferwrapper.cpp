@@ -42,10 +42,38 @@ bool BufferWrapper::writeI64(int64_t value) {
     return true;
 }
 
-bool BufferWrapper::readI8(int8_t &value) {}
+bool BufferWrapper::readI8(int8_t &value) {
+    if (_sizeRemain < sizeof(value)) return false;
+    value = (*(int8_t *)_data);
+    _data += sizeof(value);
+    _sizeRemain -= sizeof(value);
+    return true;
+}
 
-bool BufferWrapper::readI16(int16_t &value) {}
+bool BufferWrapper::readI16(int16_t &value) {
+    if (_sizeRemain < sizeof(value)) return false;
+    value = (*(int16_t *)_data);
+    _data += sizeof(value);
+    _sizeRemain -= sizeof(value);
+    return true;
+}
 
-bool BufferWrapper::readI32(int32_t &value) {}
+bool BufferWrapper::readI32(int32_t &value) {
+    if (_sizeRemain < sizeof(value)) return false;
+    value = (*(int32_t *)_data);
+    _data += sizeof(value);
+    _sizeRemain -= sizeof(value);
+    return true;
+}
 
-bool BufferWrapper::readI64(int64_t &value) {}
+bool BufferWrapper::readI64(int64_t &value) {
+    if (_sizeRemain < sizeof(value)) return false;
+    value = (*(int64_t *)_data);
+    _data += sizeof(value);
+    _sizeRemain -= sizeof(value);
+    return true;
+}
+
+bool BufferWrapper::serializeNumber() {}
+
+bool BufferWrapper::deserializeNumber() {}

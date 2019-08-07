@@ -31,6 +31,10 @@ public:  // read functions
     bool readI16(int16_t& value);
     bool readI32(int32_t& value);
     bool readI64(int64_t& value);
+
+public:  // unit tests
+    bool serializeNumber();
+    bool deserializeNumber();
 };
 
 #endif  // BUFFERWRAPPER_H
