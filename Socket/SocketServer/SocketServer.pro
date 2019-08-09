@@ -16,8 +16,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp \
     client.cpp \
-    roomchat.cpp
+    roomchat.cpp \
+    bufferwrapper.cpp
 
 HEADERS += \
     client.h \
-    roomchat.h
+    roomchat.h \
+    bufferwrapper.h
