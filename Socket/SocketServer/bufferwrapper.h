@@ -10,6 +10,7 @@
 #include <bits/stdint-uintn.h>
 #include <stdint.h>
 #include <cstring>
+#include <cassert>
 // This class doesn't have the ownership with the data it hold
 class BufferWrapper {
 private:
@@ -19,7 +20,7 @@ private:
 public:
     BufferWrapper(uint8_t* const srcData, size_t dataLen);
     virtual ~BufferWrapper();
-
+    size_t sizeRemain() const;
 public:  // write functions
     bool writeI8(int8_t value);
     bool writeI16(int16_t value);
@@ -33,8 +34,8 @@ public:  // read functions
     bool readI64(int64_t& value);
 
 public:  // unit tests
-    bool serializeNumber();
-    bool deserializeNumber();
+    static bool serializeNumber();
+    static bool deserializeNumber();
 };
 
 #endif  // BUFFERWRAPPER_H

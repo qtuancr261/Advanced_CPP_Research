@@ -8,6 +8,7 @@
 #include <fstream>
 #include <thread>
 #include "roomchat.h"
+#include "bufferwrapper.h"
 using namespace std;
 const int MAXSIZE{200000};
 
@@ -101,6 +102,9 @@ void* handleNewClientConnection(void* client_socket)
 }
 int main()
 {
+    size_t sizeData = 10;
+    uint8_t* data  = new uint8_t[10];
+    BufferWrapper gt{data,sizeData};
     int socket_server{socket(AF_INET, SOCK_STREAM, 0)};
     if (socket_server == -1)
         printf("Couldn't create socket\n");

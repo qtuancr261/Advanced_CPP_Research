@@ -10,6 +10,8 @@ BufferWrapper::BufferWrapper(uint8_t *const srcData, size_t dataLen) : _data{src
 
 BufferWrapper::~BufferWrapper() {}
 
+size_t BufferWrapper::sizeRemain() const { return _sizeRemain;}
+
 bool BufferWrapper::writeI8(int8_t value) {
     if (_sizeRemain < sizeof(value)) return false;
     *((int8_t *)_data) = value;
@@ -74,6 +76,18 @@ bool BufferWrapper::readI64(int64_t &value) {
     return true;
 }
 
-bool BufferWrapper::serializeNumber() {}
+bool BufferWrapper::serializeNumber() {
+    const int dataSize = 10;
+    uint8_t* data = new uint8_t[dataSize];
+    BufferWrapper buf{data, dataSize};
+    assert(buf.writeI32(3456220112));
+    assert(buf.writeI16(45000));
+    assert(buf.writeI16(1933));
+    assert(buf.writeI8(255));
+    assert(buf.writeI8(1));
+    assert(buf.sizeRemain() == 0);
+    delete data;
+    return true;
+}
 
 bool BufferWrapper::deserializeNumber() {}
