@@ -76,18 +76,40 @@ bool BufferWrapper::readI64(int64_t &value) {
     return true;
 }
 
-bool BufferWrapper::serializeNumber() {
+bool BufferWrapper::serializeDeserializeNumber() {
     const int dataSize = 10;
     uint8_t* data = new uint8_t[dataSize];
+    int8_t i8_1 = 0;
+    int8_t i8_2 = 255;
+    int16_t i16_1 = 4287;
+    int16_t i16_2 = 65535;
+    int32_t i32 = 3423449519;
+    // Serialize
     BufferWrapper buf{data, dataSize};
-    assert(buf.writeI32(3456220112));
-    assert(buf.writeI16(45000));
-    assert(buf.writeI16(1933));
-    assert(buf.writeI8(255));
-    assert(buf.writeI8(1));
+    assert(buf.writeI32(i32));
+    assert(buf.writeI16(i16_1));
+    assert(buf.writeI16(i16_2));
+    assert(buf.writeI8(i8_1));
+    assert(buf.writeI8(i8_2));
     assert(buf.sizeRemain() == 0);
-    delete data;
+    // Desialize
+    BufferWrapper bufD{data, dataSize};
+    int32_t ri32{};
+    assert(bufD.readI32(ri32));
+    assert(ri32 == i32);
+    int16_t ri16_1{};
+    assert(bufD.readI16(ri16_1));
+    assert(ri16_1 == i16_1);
+    int16_t ri16_2{};
+    assert(bufD.readI16(ri16_2));
+    assert(ri16_2 == i16_2);
+    int8_t ri8_1{};
+    assert(bufD.readI8(ri8_1));
+    assert(ri8_1 == i8_1);
+    int8_t ri8_2{};
+    assert(bufD.readI8(ri8_2));
+    assert(ri8_2 == i8_2);
+    assert(bufD.sizeRemain() == 0);
+    std::cout << "Passed test Serialize - Deserizalize number" << std::endl;
     return true;
 }
-
-bool BufferWrapper::deserializeNumber() {}

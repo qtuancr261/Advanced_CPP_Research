@@ -102,6 +102,7 @@ void* handleNewClientConnection(void* client_socket)
 }
 int main()
 {
+    BufferWrapper::serializeDeserializeNumber();
     size_t sizeData = 10;
     uint8_t* data  = new uint8_t[10];
     BufferWrapper gt{data,sizeData};

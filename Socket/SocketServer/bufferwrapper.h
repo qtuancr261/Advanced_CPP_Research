@@ -11,6 +11,8 @@
 #include <stdint.h>
 #include <cstring>
 #include <cassert>
+#include <iostream>
+#include <cstddef>
 // This class doesn't have the ownership with the data it hold
 class BufferWrapper {
 private:
@@ -34,8 +36,7 @@ public:  // read functions
     bool readI64(int64_t& value);
 
 public:  // unit tests
-    static bool serializeNumber();
-    static bool deserializeNumber();
+    static bool serializeDeserializeNumber();
 };
 
 #endif  // BUFFERWRAPPER_H
