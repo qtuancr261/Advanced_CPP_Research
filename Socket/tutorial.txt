@@ -26,3 +26,7 @@ Client Soket:
  4. send/recv - repeate until we have receive data
  5. shutdown to end read/write
  6. close to releases data
+
+##### Advanced Server-client projects
+- SocketServer : tcp server support multi room chat with multi clients ,file sending and receiving
+- ClientSide   : tcp client use for SocketServer  
