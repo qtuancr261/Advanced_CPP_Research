@@ -13,6 +13,9 @@
 #include <cassert>
 #include <iostream>
 #include <cstddef>
+#include <string>
+
+using std::string;
 // This class doesn't have the ownership with the data it hold
 class BufferWrapper {
 private:
@@ -28,12 +31,14 @@ public:  // write functions
     bool writeI16(int16_t value);
     bool writeI32(int32_t value);
     bool writeI64(int64_t value);
+    bool writeString(const string& srcString);
 
 public:  // read functions
     bool readI8(int8_t& value);
     bool readI16(int16_t& value);
     bool readI32(int32_t& value);
     bool readI64(int64_t& value);
+    bool readString(string& desString);
 
 public:  // unit tests
     static bool serializeDeserializeNumber();
