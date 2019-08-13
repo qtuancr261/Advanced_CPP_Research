@@ -119,5 +119,6 @@ bool BufferWrapper::serializeDeserializeNumber() {
     assert(ri8_2 == i8_2);
     assert(bufD.sizeRemain() == 0);
     std::cout << "Passed test Serialize - Deserizalize number" << std::endl;
+    delete[] data;
     return true;
 }
