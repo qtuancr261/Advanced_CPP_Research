@@ -6,8 +6,6 @@
  */
 #ifndef MESSAGECLIENTREGISTER_H
 #define MESSAGECLIENTREGISTER_H
-
-
 class MessageClientReqRegister
 {
 public:
