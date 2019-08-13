@@ -6,7 +6,8 @@
  */
 #include "MessageClientBase.h"
 
-MessageClientBase::MessageClientBase()
-{
+MessageClientBase::MessageClientBase(MsgType msgType) : frameSize{}, msgType{static_cast<MessageType>(msgType)}, version{1}, seqId{++currentSeqId} {}
 
-}
+MessageClientBase::~MessageClientBase() {}
+
+bool MessageClientBase::_serializeCommonHeader() { return true; }

@@ -7,12 +7,27 @@
 #ifndef MESSAGECLIENTBASE_H
 #define MESSAGECLIENTBASE_H
 
-#include <bits/stdint-intn.h>
+#include <atomic>
+#include "MessageDef.h"
 
-class MessageClientBase
-{
+using std::atomic;
+class MessageClientBase {
+private:
+    static inline atomic<int64_t> currentSeqId{0};
+
 public:
-    MessageClientBase();
+    // common headers only
+    FrameSize frameSize;
+    MessageType msgType;
+    ProtocolVersion version;
+    SeqId seqId;
+
+public:
+    MessageClientBase(MsgType msgType);
+    virtual ~MessageClientBase();
+
+protected:
+    bool _serializeCommonHeader();
 };
 
-#endif // MESSAGECLIENTBASE_H
+#endif  // MESSAGECLIENTBASE_H
