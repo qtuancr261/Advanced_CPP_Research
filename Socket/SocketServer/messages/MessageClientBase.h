@@ -23,11 +23,12 @@ public:
     SeqId seqId;
 
 public:
-    MessageClientBase(MsgType msgType);
+    explicit MessageClientBase(MsgType msgType);
     virtual ~MessageClientBase();
 
 protected:
     bool _serializeCommonHeader();
+    bool _deserializeCommonHeader();
 };
 
 #endif  // MESSAGECLIENTBASE_H

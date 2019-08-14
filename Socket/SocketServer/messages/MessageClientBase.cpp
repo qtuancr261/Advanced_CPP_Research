@@ -11,3 +11,5 @@ MessageClientBase::MessageClientBase(MsgType msgType) : frameSize{}, msgType{sta
 MessageClientBase::~MessageClientBase() {}
 
 bool MessageClientBase::_serializeCommonHeader() { return true; }
+
+bool MessageClientBase::_deserializeCommonHeader() { return true; }
