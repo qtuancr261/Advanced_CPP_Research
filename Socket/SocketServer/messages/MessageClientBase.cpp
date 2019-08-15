@@ -6,10 +6,10 @@
  */
 #include "MessageClientBase.h"
 
-MessageClientBase::MessageClientBase(MsgType msgType) : frameSize{}, msgType{static_cast<MessageType>(msgType)}, version{1}, seqId{++currentSeqId} {}
+MessageClientBase::MessageClientBase(MsgType msgType) : frameSize{}, msgType{static_cast<MessageType>(msgType)}, seqId{++currentSeqId} {}
 
 MessageClientBase::~MessageClientBase() {}
 
-bool MessageClientBase::_serializeCommonHeader() { return true; }
+bool MessageClientBase::_serializeCommonHeader(BufferWrapper &buf) { return true; }
 
-bool MessageClientBase::_deserializeCommonHeader() { return true; }
+bool MessageClientBase::_deserializeCommonHeader(BufferWrapper &buf) { return true; }

@@ -8,7 +8,9 @@
 #define MESSAGECLIENTBASE_H
 
 #include <atomic>
+#include <memory>
 #include "MessageDef.h"
+#include "bufferwrapper.h"
 
 using std::atomic;
 class MessageClientBase {
@@ -19,7 +21,6 @@ public:
     // common headers only
     FrameSize frameSize;
     MessageType msgType;
-    ProtocolVersion version;
     SeqId seqId;
 
 public:
@@ -27,8 +28,8 @@ public:
     virtual ~MessageClientBase();
 
 protected:
-    bool _serializeCommonHeader();
-    bool _deserializeCommonHeader();
+    bool _serializeCommonHeader(BufferWrapper& buf);
+    bool _deserializeCommonHeader(BufferWrapper& buf);
 };
 
 #endif  // MESSAGECLIENTBASE_H
