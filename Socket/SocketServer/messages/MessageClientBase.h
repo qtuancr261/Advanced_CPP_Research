@@ -30,6 +30,9 @@ public:
 protected:
     bool _serializeCommonHeader(BufferWrapper& buf);
     bool _deserializeCommonHeader(BufferWrapper& buf);
+
+    virtual bool _serializeSpecHeader(BufferWrapper& buf) = 0;
+    virtual bool _deserializeSpecHeader(BufferWrapper& buf) = 0;
 };
 
 #endif  // MESSAGECLIENTBASE_H
