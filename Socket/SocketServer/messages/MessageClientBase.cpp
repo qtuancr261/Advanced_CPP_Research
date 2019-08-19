@@ -11,17 +11,17 @@ MessageClientBase::MessageClientBase(MsgType msgType) : frameSize{}, msgType{sta
 MessageClientBase::~MessageClientBase() {}
 
 bool MessageClientBase::_serializeCommonHeader(BufferWrapper &buf) {
-    if (buf.writeI32(frameSize)) return false;
-    if (buf.writeI8(msgType)) return false;
-    if (buf.writeI64(seqId)) return false;
+    if (buf.writeInt(frameSize)) return false;
+    if (buf.writeInt(msgType)) return false;
+    if (buf.writeInt(seqId)) return false;
     if (_serializeSpecHeader(buf)) return false;
     return true;
 }
 
 bool MessageClientBase::_deserializeCommonHeader(BufferWrapper &buf) {
-    if (buf.readI32(frameSize)) return false;
-    if (buf.readI8(msgType)) return false;
-    if (buf.readI64(seqId)) return false;
+    if (buf.readInt(frameSize)) return false;
+    if (buf.readInt(msgType)) return false;
+    if (buf.readInt(seqId)) return false;
     if (_deserializeSpecHeader(buf)) return false;
     return true;
 }
