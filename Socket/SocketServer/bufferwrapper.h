@@ -18,10 +18,13 @@
 
 #define POWEROF2(nbits) (1ull << (nbits))
 #define MASK1(nbits) (POWEROF2(nbits) - 1)
+using std::cout;
 using std::default_random_engine;
+using std::endl;
 using std::random_device;
 using std::seed_seq;
 using std::string;
+using std::uniform_int_distribution;
 // This class doesn't have the ownership with the data it hold
 class BufferWrapper {
 private:
