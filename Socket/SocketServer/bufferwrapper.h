@@ -37,17 +37,27 @@ public:
     size_t sizeRemain() const;
 
 public:  // write functions
-    bool writeI8(int8_t value);
-    bool writeI16(int16_t value);
-    bool writeI32(int32_t value);
-    bool writeI64(int64_t value);
+    template <typename T>
+    bool writeInt(T value) {
+        if (_sizeRemain < sizeof(value)) return false;
+        *((T*)_data) = value;
+        _data += sizeof(value);
+        _sizeRemain -= sizeof(value);
+        return true;
+    }
+
     bool writeString(const string& srcString);
 
 public:  // read functions
-    bool readI8(int8_t& value);
-    bool readI16(int16_t& value);
-    bool readI32(int32_t& value);
-    bool readI64(int64_t& value);
+    template <typename T>
+    bool readInt(T& value) {
+        if (_sizeRemain < sizeof(value)) return false;
+        value = *((T*)_data);
+        _data += sizeof(value);
+        _sizeRemain -= sizeof(value);
+        return true;
+    }
+
     bool readString(string& desString);
 
 public:  // unit tests
