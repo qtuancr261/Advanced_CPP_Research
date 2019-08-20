@@ -12,7 +12,19 @@ BufferWrapper::~BufferWrapper() {}
 
 size_t BufferWrapper::sizeRemain() const { return _sizeRemain; }
 
-bool BufferWrapper::writeString(const string &srcString) { return true; }
+bool BufferWrapper::writeString(const string &srcString) {
+    if (_sizeRemain < (sizeof(uint32_t) + srcString.size())) return false;
+    // write 4 bytes size
+    *((uint32_t *)_data) = srcString.size();
+    _data += sizeof(uint32_t);
+    _sizeRemain -= sizeof(uint32_t);
+    if (srcString.size() > 0) {
+        memcpy(_data, srcString.data(), srcString.size());
+        _data += srcString.size();
+        _sizeRemain -= srcString.size();
+    }
+    return true;
+}
 
 bool BufferWrapper::readString(string &desString) { return true; }
 
