@@ -26,7 +26,23 @@ bool BufferWrapper::writeString(const string &srcString) {
     return true;
 }
 
-bool BufferWrapper::readString(string &desString) { return true; }
+bool BufferWrapper::readString(string &desString) {
+    if (_sizeRemain < sizeof(uint32_t)) return false;
+    // read 4 bytes size
+    uint32_t stringLen = *((uint32_t *)_data);
+    _data += sizeof(uint32_t);
+    _sizeRemain -= sizeof(uint32_t);
+    if (_sizeRemain < stringLen) return false;
+    if (stringLen > 0) {
+        // memcpy(desString.data(), _data, stringLen); -> didn't work =))
+        desString.assign((char *)_data, stringLen);
+        _data += stringLen;
+        _sizeRemain -= stringLen;
+    } else {
+        desString.clear();
+    }
+    return true;
+}
 
 bool BufferWrapper::serializeDeserializeNumber() {
     const int dataSize = 10;
@@ -67,6 +83,30 @@ bool BufferWrapper::serializeDeserializeNumber() {
     assert(ri8_2 == i8_2);
     assert(bufD.sizeRemain() == 0);
     std::cout << "Passed test Serialize - Deserizalize number" << std::endl;
+    delete[] data;
+    return true;
+}
+
+bool BufferWrapper::serializeDeserializeString() {
+    string message{"This is a test message"};
+    uint32_t totalSize = sizeof(uint32_t) + sizeof(uint32_t) + message.size();
+    uint8_t *data = new uint8_t[totalSize];
+    BufferWrapper wrapperW{data, totalSize};
+    assert(wrapperW.writeInt(totalSize));
+    assert(wrapperW.writeString(message));
+    assert(wrapperW.sizeRemain() == 0);
+
+    BufferWrapper wrapperR{data, totalSize};
+    uint32_t rSize{};
+    assert(wrapperR.readInt(rSize));
+    assert(rSize == totalSize);
+    string rMessage{};
+    assert(wrapperR.readString(rMessage));
+    std::cout << rMessage << endl;
+    assert(rMessage == message);
+    assert(wrapperR.sizeRemain() == 0);
+
+    std::cout << "Passed test Serialize - Deserizalize std::string: " << rMessage << std::endl;
     delete[] data;
     return true;
 }

@@ -62,6 +62,7 @@ public:  // read functions
 
 public:  // unit tests
     static bool serializeDeserializeNumber();
+    static bool serializeDeserializeString();
 };
 
 #endif  // BUFFERWRAPPER_H
