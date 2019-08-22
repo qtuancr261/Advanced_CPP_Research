@@ -9,13 +9,22 @@
 
 #include <bits/stdint-uintn.h>
 #include <stdint.h>
-#include <cstring>
 #include <cassert>
-#include <iostream>
 #include <cstddef>
+#include <cstring>
+#include <iostream>
+#include <random>
 #include <string>
 
+#define POWEROF2(nbits) (1ull << (nbits))
+#define MASK1(nbits) (POWEROF2(nbits) - 1)
+using std::cout;
+using std::default_random_engine;
+using std::endl;
+using std::random_device;
+using std::seed_seq;
 using std::string;
+using std::uniform_int_distribution;
 // This class doesn't have the ownership with the data it hold
 class BufferWrapper {
 private:
@@ -26,22 +35,34 @@ public:
     BufferWrapper(uint8_t* const srcData, size_t dataLen);
     virtual ~BufferWrapper();
     size_t sizeRemain() const;
+
 public:  // write functions
-    bool writeI8(int8_t value);
-    bool writeI16(int16_t value);
-    bool writeI32(int32_t value);
-    bool writeI64(int64_t value);
+    template <typename T>
+    bool writeInt(T value) {
+        if (_sizeRemain < sizeof(value)) return false;
+        *((T*)_data) = value;
+        _data += sizeof(value);
+        _sizeRemain -= sizeof(value);
+        return true;
+    }
+
     bool writeString(const string& srcString);
 
 public:  // read functions
-    bool readI8(int8_t& value);
-    bool readI16(int16_t& value);
-    bool readI32(int32_t& value);
-    bool readI64(int64_t& value);
+    template <typename T>
+    bool readInt(T& value) {
+        if (_sizeRemain < sizeof(value)) return false;
+        value = *((T*)_data);
+        _data += sizeof(value);
+        _sizeRemain -= sizeof(value);
+        return true;
+    }
+
     bool readString(string& desString);
 
 public:  // unit tests
     static bool serializeDeserializeNumber();
+    static bool serializeDeserializeString();
 };
 
 #endif  // BUFFERWRAPPER_H
