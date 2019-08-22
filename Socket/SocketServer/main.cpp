@@ -91,9 +91,6 @@ void* handleNewClientConnection(void* client_socket) {
 int main() {
     BufferWrapper::serializeDeserializeNumber();
     BufferWrapper::serializeDeserializeString();
-    size_t sizeData = 10;
-    uint8_t* data = new uint8_t[10];
-    BufferWrapper gt{data, sizeData};
     int socket_server{socket(AF_INET, SOCK_STREAM, 0)};
     if (socket_server == -1) printf("Couldn't create socket\n");
     sockaddr_in server{};
