@@ -6,7 +6,7 @@
  */
 #include "bufferwrapper.h"
 
-BufferWrapper::BufferWrapper(uint8_t *const srcData, size_t dataLen) : _data{srcData}, _sizeRemain{dataLen} {}
+BufferWrapper::BufferWrapper(uint8_t *srcData, size_t dataLen) : _data{srcData}, _sizeRemain{dataLen} {}
 
 BufferWrapper::~BufferWrapper() {}
 

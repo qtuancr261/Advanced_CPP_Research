@@ -32,7 +32,7 @@ private:
     size_t _sizeRemain;
 
 public:
-    BufferWrapper(uint8_t* const srcData, size_t dataLen);
+    BufferWrapper(uint8_t* srcData, size_t dataLen);
     virtual ~BufferWrapper();
     size_t sizeRemain() const;
 
