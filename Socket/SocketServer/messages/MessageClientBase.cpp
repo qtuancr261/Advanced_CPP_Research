@@ -10,6 +10,8 @@ MessageClientBase::MessageClientBase(MsgType msgType) : frameSize{}, msgType{sta
 
 MessageClientBase::~MessageClientBase() {}
 
+size_t MessageClientBase::calculateFrameSize() const { return sizeof(frameSize) + sizeof(msgType) + sizeof(seqId); }
+
 bool MessageClientBase::_serializeCommonHeader(BufferWrapper &buf) {
     if (buf.writeInt(frameSize)) return false;
     if (buf.writeInt(msgType)) return false;
