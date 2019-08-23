@@ -10,18 +10,18 @@ MessageClientReqRegister::MessageClientReqRegister(MsgType msgType) : MessageCli
     // default constructor
 }
 
-shared_ptr<uint8_t[]> MessageClientReqRegister::serialize() {
-    frameSize = static_cast<FrameSize>(calculateFrameSize());
-    shared_ptr<uint8_t[]> serializedData{new uint8_t[frameSize]};
-    // Make sure bvffer Wrapper doesn't take ownership of the serialized data
-    BufferWrapper serializedDataWrapper{serializedData.get(), static_cast<size_t>(frameSize)};
-    if (_serializeCommonHeader(serializedDataWrapper))
-        return serializedData;
-    else {
-        return nullptr;
-    }
+bool MessageClientReqRegister::serialize(shared_ptr<uint8_t[]> &data, size_t &dataSize) {
+    dataSize = calculateFrameSize();
+    shared_ptr<uint8_t[]> tempData{new uint8_t[dataSize]};
+    data.swap(tempData);
+    // Correct frameSize header
+    frameSize = dataSize;
+    // Make sure buffer Wrapper doesn't take ownership of the serialized data
+    BufferWrapper serializedDataWrapper{data.get(), dataSize};
+    return _serializeCommonHeader(serializedDataWrapper);
 }
 
+bool MessageClientReqRegister::deserialize(shared_ptr<uint8_t[]> &data, size_t &dataSize) {}
 bool MessageClientReqRegister::_serializeSpecHeader(BufferWrapper &buf) { return true; }
 
 bool MessageClientReqRegister::_deserializeSpecHeader(BufferWrapper &buf) { return true; }

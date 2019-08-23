@@ -11,17 +11,18 @@
 class MessageClientReqRegister : public MessageClientBase {
 public:
     string name;
-    MessageClientReqRegister(MsgType msgType = MsgType::REQ_REGISTER);
+    explicit MessageClientReqRegister(MsgType msgType = MsgType::REQ_REGISTER);
     virtual ~MessageClientReqRegister() override = default;
 
     // MessageClientBase interface
 public:
     //
-    virtual shared_ptr<uint8_t[]> serialize() override;
+    virtual bool serialize(shared_ptr<uint8_t[]>& data, size_t& dataSize) override;
+    virtual bool deserialize(shared_ptr<uint8_t[]>& data, size_t& dataSize) override;
 
 protected:
-    virtual bool _serializeSpecHeader(BufferWrapper &buf) override;
-    virtual bool _deserializeSpecHeader(BufferWrapper &buf) override;
+    virtual bool _serializeSpecHeader(BufferWrapper& buf) override;
+    virtual bool _deserializeSpecHeader(BufferWrapper& buf) override;
 
     // MessageClientBase interface
 protected:
