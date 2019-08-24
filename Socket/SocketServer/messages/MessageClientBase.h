@@ -31,7 +31,8 @@ public:
     // Use this method for serialize - deserialize
     // Before C++17, only std::unique_ptr was able to handle arrays out of the box
     // Now it's also possible with std::shared_ptr except std::make_shared (until C++20)
-    virtual shared_ptr<uint8_t[]> serialize() = 0;
+    virtual bool serialize(shared_ptr<uint8_t[]>& data, size_t& datSize) = 0;
+    virtual bool deserialize(shared_ptr<uint8_t[]>& data, size_t& dataSize) = 0;
 
 protected:
     virtual size_t calculateFrameSize() const;
