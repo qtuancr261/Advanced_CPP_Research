@@ -19,6 +19,8 @@
 #define POWEROF2(nbits) (1ull << (nbits))
 #define MASK1(nbits) (POWEROF2(nbits) - 1)
 using std::cout;
+
+using std::clog;
 using std::default_random_engine;
 using std::endl;
 using std::random_device;

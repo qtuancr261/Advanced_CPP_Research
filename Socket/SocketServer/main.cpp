@@ -8,6 +8,7 @@
 #include <list>
 #include <thread>
 #include "bufferwrapper.h"
+#include "messages/MessageClientReqRegister.h"
 #include "roomchat.h"
 using namespace std;
 const int MAXSIZE{200000};
@@ -91,6 +92,7 @@ void* handleNewClientConnection(void* client_socket) {
 int main() {
     BufferWrapper::serializeDeserializeNumber();
     BufferWrapper::serializeDeserializeString();
+    MessageClientReqRegister::testSerializeDeserialize();
     int socket_server{socket(AF_INET, SOCK_STREAM, 0)};
     if (socket_server == -1) printf("Couldn't create socket\n");
     sockaddr_in server{};

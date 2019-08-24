@@ -14,11 +14,14 @@ public:
     explicit MessageClientReqRegister(MsgType msgType = MsgType::REQ_REGISTER);
     virtual ~MessageClientReqRegister() override = default;
 
+    bool operator==(const MessageClientReqRegister& srcMessage) const;
+
     // MessageClientBase interface
 public:
     //
     virtual bool serialize(shared_ptr<uint8_t[]>& data, size_t& dataSize) override;
     virtual bool deserialize(shared_ptr<uint8_t[]>& data, size_t& dataSize) override;
+    static bool testSerializeDeserialize();
 
 protected:
     virtual bool _serializeSpecHeader(BufferWrapper& buf) override;
