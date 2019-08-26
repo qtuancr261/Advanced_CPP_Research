@@ -1,6 +1,6 @@
 QT -= gui
 
-CONFIG += c++11 console
+CONFIG += c++17 console
 CONFIG -= app_bundle
 
 # The following define makes your compiler emit warnings if you use
@@ -16,8 +16,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp \
     client_core.cpp \
-    bufferwrapper.cpp
+    bufferwrapper.cpp \
+    messages/MessageClientBase.cpp \
+    messages/MessageClientReqRegister.cpp 
 
 HEADERS += \
     client_core.h \
-    bufferwrapper.h
+    bufferwrapper.h \
+    messages/MessageClientBase.h \
+    messages/MessageClientReqRegister.h \
+    messages/MessageDef.h
