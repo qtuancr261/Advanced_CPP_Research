@@ -6,7 +6,14 @@
  */
 #include "serverapp.h"
 
-ServerApp::ServerApp()
-{
+ServerApp::ServerApp() {}
 
-}
+void ServerApp::initialize(Poco::Util::Application &self) {}
+
+void ServerApp::uninitialize() {}
+
+void ServerApp::reinitialize(Poco::Util::Application &selft) {}
+
+void ServerApp::handleOption(const std::string &name, const std::string &value) {}
+
+int ServerApp::main(const std::vector<std::string> &args) {}
