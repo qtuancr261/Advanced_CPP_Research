@@ -19,7 +19,8 @@ SOURCES += main.cpp \
     messages/MessageClientBase.cpp \
     messages/MessageClientReqRegister.cpp \
     roomchat.cpp \
-    bufferwrapper.cpp
+    bufferwrapper.cpp \
+    serverapp.cpp
 
 HEADERS += \
     client.h \
@@ -27,4 +28,9 @@ HEADERS += \
     messages/MessageClientReqRegister.h \
     messages/MessageDef.h \
     roomchat.h \
-    bufferwrapper.h
+    bufferwrapper.h \
+    serverapp.h
+
+# Poco Library
+INCLUDEPATH += ../zpoco/inc
+LIBS += ../../zpoco/lib/libzpoco.a
