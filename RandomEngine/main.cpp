@@ -19,7 +19,7 @@ using std::random_device;
 using std::seed_seq;
 using std::string;
 using std::vector;
-
+#define MAX_SESSION_CURSOR ((uint16_t(int16_t(-1)) / 15) * 15 - 1)
 #define seperatorBeginEnd cout << endl << "-------------------------------------------------------------" << endl
 
 void testObtaningRandomSeeds(int numSeeds) {
@@ -86,5 +86,7 @@ int main(int argc, char* argv[]) {
     testObtaningRandomSeeds(10);
     // gen seed sequences
     testSeedSeq();
+    int t = MAX_SESSION_CURSOR;
+    std::cout << " MAX" << t;
     return 0;
 }
