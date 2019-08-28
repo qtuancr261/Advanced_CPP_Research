@@ -32,5 +32,18 @@ HEADERS += \
     serverapp.h
 
 # Poco Library
-INCLUDEPATH += ../zpoco/inc
-LIBS += ../../zpoco/lib/libzpoco.a
+#INCLUDEPATH += ../zpoco/inc
+#LIBS += ../../zpoco/lib/libzpoco.a
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../zpoco/lib/release/ -lzpocod
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../zpoco/lib/debug/ -lzpocod
+else:unix: LIBS += -L$$PWD/../zpoco/lib/ -lzpocod
+
+INCLUDEPATH += $$PWD/../zpoco/inc
+DEPENDPATH += $$PWD/../zpoco/inc
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../zpoco/lib/release/libzpocod.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../zpoco/lib/debug/libzpocod.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../zpoco/lib/release/zpocod.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../zpoco/lib/debug/zpocod.lib
+else:unix: PRE_TARGETDEPS += $$PWD/../zpoco/lib/libzpocod.a
