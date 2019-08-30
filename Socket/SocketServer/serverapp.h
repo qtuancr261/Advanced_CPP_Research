@@ -29,6 +29,7 @@ using std::vector;
 using RoomChatPtr = shared_ptr<RoomChat>;
 class ServerApp : public Application {
 private:
+    inline static const int MAX_CONNECTION{5};
     RoomChatPtr _publicRoom;
     vector<RoomChatPtr> _privatesRoom;
 

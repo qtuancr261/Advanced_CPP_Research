@@ -34,10 +34,10 @@ int ServerApp::main(const std::vector<std::string> &args) {
         return EX_OSERR;
     }
 
-    listen(socketServer, 5);
+    listen(socketServer, MAX_CONNECTION);
     std::cout << "Waiting for incoming connection ......... \n";
 
-    vector<thread *> threads{};
+    vector<unique_ptr<thread>> threads{};
     sockaddr_in clientInfo{};
     int clLen{sizeof(clientInfo)};
     int socketClient{};
@@ -47,19 +47,19 @@ int ServerApp::main(const std::vector<std::string> &args) {
             continue;
         }
         std::cout << "Incoming connection from address " << inet_ntoa(clientInfo.sin_addr) << " port " << ntohs(clientInfo.sin_port) << endl;
-        thread handleClient{&ServerApp::handleNewConnection, this, socketClient};
-        handleClient.join();
-        // threads.push_back(&handleClient);
-        break;
+        // thread handleClient{&ServerApp::handleNewConnection, this, socketClient};
+        threads.push_back(make_unique<thread>(&ServerApp::handleNewConnection, this, socketClient));
+        if (threads.size() == MAX_CONNECTION) {
+            break;
+        }
     }
-    // for (thread *&threadHandle : threads) {
-    //    threadHandle->join();
-    //}
+    for (auto &threadHandle : threads) {
+        threadHandle->join();
+    }
     std::cout << "Close sever application \n";
     close(socketServer);
     return EX_OK;
 }
-
 const char *ServerApp::name() const { return SERVER_NAME; }
 
 void ServerApp::handleNewConnection(int clientSocket) {

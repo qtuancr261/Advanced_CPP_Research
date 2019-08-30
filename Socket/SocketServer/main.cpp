@@ -94,41 +94,6 @@ int main() {
     BufferWrapper::serializeDeserializeNumber();
     BufferWrapper::serializeDeserializeString();
     MessageClientReqRegister::testSerializeDeserialize();
-    //    int socket_server{socket(AF_INET, SOCK_STREAM, 0)};
-    //    if (socket_server == -1) printf("Couldn't create socket\n");
-    //    sockaddr_in server{};
-    //    server.sin_port = htons(2610);
-    //    server.sin_addr.s_addr = INADDR_ANY;
-    //    server.sin_family = AF_INET;
-    //    if (bind(socket_server, (sockaddr*)(&server), sizeof(server)) < 0) {
-    //        printf("bind failed\n");
-    //        exit(1);
-    //    }
-    //    // listen
-    //    listen(socket_server, 5);
-    //    printf("Waiting for incoming connection \n");
-    //    // accept new connection
-    //    sockaddr_in client{};
-    //    int client_size{sizeof(sockaddr_in)};
-    //    int client_socket{};
-    //    while ((client_socket = accept(socket_server, (sockaddr*)&client, (socklen_t*)&client_size))) {
-    //        if (client_socket < 0) {
-    //            printf("connection failed\n");
-    //            continue;
-    //        }
-    //        printf("connection accepted from client: adress %s port %d des %d \n", inet_ntoa(client.sin_addr), ntohs(client.sin_port), client_socket);
-    //        // pthread_t serverHandlerThread{};
-    //        int* ptrClient_socket{new int{client_socket}};
-    //        /*if (pthread_create(&serverHandlerThread, nullptr, handleNewClientConnection, (void*)ptrClient_socket) < 0)
-    //        {
-    //            printf("Cannot create a thread for new connection");
-    //        }*/
-    //        thread serverHandlerThread{handleNewClientConnection, (void*)ptrClient_socket};
-    //        serverHandlerThread.detach();
-    //    }
-    //    // int new_socket{accept(socket_desciptor, (sockaddr*)&client, (socklen_t*)&client_size)};
-    //    // cout << strlen(message) << endl;
-    //    close(socket_server);
     try {
         ServerApp app;
         return app.run();
