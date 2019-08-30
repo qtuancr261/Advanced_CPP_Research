@@ -10,6 +10,7 @@ Headers:
  - <sys/socket.h> basic socket functions
  - <arpa/inet.h> internet operation
  - <netinet/in.h> internet protocol family 
+ - <unistd> socket close/read/write,... functions 
 Server Socket:
  1. create a socket - get file descriptor 
 	
