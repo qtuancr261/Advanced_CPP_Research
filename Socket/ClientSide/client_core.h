@@ -1,25 +1,25 @@
 #ifndef CLIENT_CORE_H
 #define CLIENT_CORE_H
-#include <sys/socket.h>
-#include <pthread.h>
 #include <arpa/inet.h>
+#include <pthread.h>
+#include <sys/socket.h>
 #include <unistd.h>
+#include <QString>
+#include <cstdio>
 #include <cstring>
-#include <string>
-#include <cstdio>
-#include <cstdio>
-#include <fstream>
-#include <thread>
 #include <fstream>
 #include <iostream>
-#include <QString>
-using std::ifstream;
-using std::ofstream;
-using std::ios;
+#include <memory>
+#include <string>
+#include <thread>
+#include "messages/MessageClientReqRegister.h"
 using std::cout;
+using std::ifstream;
+using std::ios;
+using std::ofstream;
+using std::shared_ptr;
 using std::string;
-class Client_Core
-{
+class Client_Core {
 private:
     QString userName;
     QString fileName;
@@ -34,6 +34,7 @@ private:
     int clientFD;
     const int MESSAGE_SIZE;
     const int RECV_MESSAGE_SIZE;
+
 public:
     Client_Core();
     bool connectToServer(int serverPort, const char* serverAddress) const;
@@ -48,4 +49,4 @@ public:
     void setClientName(QString userName);
 };
 
-#endif // CLIENT_CORE_H
+#endif  // CLIENT_CORE_H
