@@ -64,7 +64,16 @@ const char *ServerApp::name() const { return SERVER_NAME; }
 
 void ServerApp::handleNewConnection(int clientSocket) {
     string welcomeMsg{"Welcome to chat box ! Have a nive day"};
-    send(clientSocket, welcomeMsg.c_str(), welcomeMsg.size(), 0);
-    // close(clientSocket);
+    // send(clientSocket, welcomeMsg.c_str(), welcomeMsg.size(), 0);
+    MessageClientReqRegister req;
+    shared_ptr<uint8_t[]> messageData{};
+    size_t messageSize{};
+    req.name = welcomeMsg;
+    if (req.serialize(messageData, messageSize)) {
+        cout << "Framsize " << req.frameSize << endl;
+        send(clientSocket, messageData.get(), messageSize, 0);
+    }
+
+    close(clientSocket);
     std::cout << "Close connection ....... \n";
 }
