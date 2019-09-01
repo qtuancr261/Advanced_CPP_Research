@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include <thread>
 #include "threadguard.h"
 #include "worker.h"
@@ -28,6 +29,9 @@ int say(string& message) {
     message.append(" - said");
     cout << "Internal thread we say after appending: " << message << endl;
     return 1;
+}
+void processObject(unique_ptr<int> num) {
+    // Didn't do anything
 }
 void sayHi() { cout << "Hi " << endl; }
 int main() {
@@ -61,5 +65,12 @@ int main() {
 
     thread thread_6{Worker(1)};
     thread_6.join();
+
+    // when the source object is a temporary, the move is automatic
+    // but when one is a named value, the transfer must be requested directly by calling std::move
+    unique_ptr<int> numInt{make_unique<int>(2610)};
+    thread thread_7{processObject, move(numInt)};
+    // By the way. std::thread have the same ownership semantics as std::unique_ptr
+    // They do own a resource: each instance is responsible for managing a thread of execution
     return 0;
 }
