@@ -14,6 +14,7 @@
 
 using std::copy;
 using std::cout;
+using std::default_random_engine;
 using std::endl;
 using std::random_device;
 using std::seed_seq;
@@ -81,6 +82,16 @@ void testSeedSeq(size_t numGenValue = 10) {
     genSeedSequences(seedSeq_5, "seedSeq_5 - use a range ");
 }
 
+void testDefaultRandomNumGenerator() {
+    // std::default_random_engine is a general-purpose of random uintegers
+    default_random_engine randEngine1;        // default seed (the random sequences will always be the same)
+    default_random_engine randEngine2{2610};  // supply seed by yourself but still fixed
+
+    random_device randDev;
+    default_random_engine randEngine3{randDev()};  // use seed created by random_device -> the sequence will be a suprise everytime
+    seed_seq seedSeq{randDev(), randDev(), randDev()};
+    default_random_engine randEngine4{seedSeq};  // or we could use a seed_seq as parameter
+}
 int main(int argc, char* argv[]) {
     // gen single seed value
     testObtaningRandomSeeds(10);
