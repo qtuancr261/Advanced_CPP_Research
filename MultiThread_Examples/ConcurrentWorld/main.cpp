@@ -1,6 +1,10 @@
+#include <functional>
 #include <iostream>
+#include <iterator>
 #include <memory>
+#include <random>
 #include <thread>
+#include <vector>
 #include "threadguard.h"
 #include "worker.h"
 using namespace std;
@@ -32,8 +36,37 @@ int say(string& message) {
 }
 void processObject(unique_ptr<int> num) {
     // Didn't do anything
+    cout << "Thread id " << std::this_thread::get_id() << endl;
 }
 void sayHi() { cout << "Hi " << endl; }
+
+template <typename Iterator, typename T>
+T parallel_calculateSum(Iterator first, Iterator last, T initValue = 0) {
+    int length = std::distance(first, last);
+    if (length == 0) return initValue;
+    const int MIN_ENTRIES_PER_THREAD{32};
+    const int MAX_THREADS{(length + MIN_ENTRIES_PER_THREAD) / MIN_ENTRIES_PER_THREAD};
+    const int MAX_HW_THREADS{static_cast<int>(thread::hardware_concurrency())};
+    int numThreads{(MAX_THREADS < MAX_HW_THREADS ? MAX_THREADS : MAX_HW_THREADS / 2)};
+    int entriesPerBlock{length / numThreads};
+    std::vector<T> results(numThreads, 0);
+    std::vector<std::thread> threads(numThreads - 1);
+    Iterator blockStart{first};
+
+    for (int i = 0; i < (numThreads - 1); ++i) {
+        Iterator blockEnd{blockStart};
+        Worker worker(5);
+        std::advance(blockEnd, entriesPerBlock);
+        threads[i] = std::thread(&Worker::calculateSum<Iterator, T>, &worker, blockStart, blockEnd, std::ref(results[i]));
+        std::advance(blockStart, entriesPerBlock);
+    }
+    Worker worker(6);
+    worker.calculateSum<Iterator, T>(blockStart, last, results[numThreads - 1]);
+    for (std::thread& threadI : threads) {
+        threadI.join();
+    }
+    return std::accumulate(std::begin(results), std::end(results), initValue);
+}
 int main() {
     int i = 20;
     funct F1{i};
@@ -70,7 +103,19 @@ int main() {
     // but when one is a named value, the transfer must be requested directly by calling std::move
     unique_ptr<int> numInt{make_unique<int>(2610)};
     thread thread_7{processObject, move(numInt)};
+    thread_7.join();
     // By the way. std::thread have the same ownership semantics as std::unique_ptr
     // They do own a resource: each instance is responsible for managing a thread of execution
+    std::random_device randDev;
+    std::uniform_int_distribution<int> uniformDistribution{0, 1000};
+    std::default_random_engine randEngine{randDev()};
+    std::vector<int> randNumbers(1000, 0);
+    for (int& num : randNumbers) {
+        num = uniformDistribution(randEngine);
+    }
+    std::copy(std::begin(randNumbers), std::end(randNumbers), std::ostream_iterator<int>{std::cout, " - "});
+    std::cout << std::endl << "Sum by std::accumulate: " << std::accumulate(std::begin(randNumbers), std::end(randNumbers), 0) << std::endl;
+    std::cout << std::endl
+              << "Sum by parallel_calculateSum: " << parallel_calculateSum<std::vector<int>::iterator, int>(std::begin(randNumbers), std::end(randNumbers), 0);
     return 0;
 }
