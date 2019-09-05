@@ -49,19 +49,20 @@ T parallel_calculateSum(Iterator first, Iterator last, T initValue = 0) {
     const int MAX_HW_THREADS{static_cast<int>(thread::hardware_concurrency())};
     int numThreads{(MAX_THREADS < MAX_HW_THREADS ? MAX_THREADS : MAX_HW_THREADS / 2)};
     int entriesPerBlock{length / numThreads};
+    std::cout << "Num threads: " << numThreads << "| entries/block: " << entriesPerBlock << std::endl;
     std::vector<T> results(numThreads, 0);
     std::vector<std::thread> threads(numThreads - 1);
     Iterator blockStart{first};
-
+    Worker worker(5);
     for (int i = 0; i < (numThreads - 1); ++i) {
         Iterator blockEnd{blockStart};
-        Worker worker(5);
+
         std::advance(blockEnd, entriesPerBlock);
         threads[i] = std::thread(&Worker::calculateSum<Iterator, T>, &worker, blockStart, blockEnd, std::ref(results[i]));
         std::advance(blockStart, entriesPerBlock);
     }
-    Worker worker(6);
     worker.calculateSum<Iterator, T>(blockStart, last, results[numThreads - 1]);
+
     for (std::thread& threadI : threads) {
         threadI.join();
     }
@@ -109,13 +110,14 @@ int main() {
     std::random_device randDev;
     std::uniform_int_distribution<int> uniformDistribution{0, 1000};
     std::default_random_engine randEngine{randDev()};
-    std::vector<int> randNumbers(1000, 0);
+    std::vector<int> randNumbers(12, 0);
     for (int& num : randNumbers) {
         num = uniformDistribution(randEngine);
     }
     std::copy(std::begin(randNumbers), std::end(randNumbers), std::ostream_iterator<int>{std::cout, " - "});
     std::cout << std::endl << "Sum by std::accumulate: " << std::accumulate(std::begin(randNumbers), std::end(randNumbers), 0) << std::endl;
     std::cout << std::endl
-              << "Sum by parallel_calculateSum: " << parallel_calculateSum<std::vector<int>::iterator, int>(std::begin(randNumbers), std::end(randNumbers), 0);
+              << "Sum by parallel_calculateSum: " << parallel_calculateSum<std::vector<int>::iterator, int>(std::begin(randNumbers), std::end(randNumbers), 0)
+              << endl;
     return 0;
 }
