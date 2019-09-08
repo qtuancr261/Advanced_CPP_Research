@@ -1,0 +1,14 @@
+------------------------------------------------------------------------------------------------------------------------------------
+C++11 Concurrency brief tutorial
+------------------------------------------------------------------------------------------------------------------------------------
+//// (* ref: C++ Concurrency in action ebooks by Anthony Williams *) ///////
+------------------------------------------------------------------------------------------------------------------------------------
+The C++98 standard doesn't acknowledge the existence of threads (mostly used C APIs for multithreading - such as POSIX C or Microsoft Windows API (platform-specific extensions) | boost library,....)
+With the release of the new C++ standard, there is not only a brandnew thread-aware memory model, but include classes for managing threads, protecting shared data,
+, synchronizing operations betweeen threads and low-level atomic operations (based on the prior experience through the use of the C++ class libs memtoned previously
+, the Boost Thread library has been used as the primary model on which the new library is based)
+You can check the compiler that support C++11 standard at https://en.cppreference.com/w/cpp/compiler_support
+------------------------------------------------------------------------------------------------------------------------------------
+Headers:
+ - <thread> std::thread
+------------------------------------------------------------------------------------------------------------------------------------
