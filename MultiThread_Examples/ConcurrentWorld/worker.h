@@ -16,7 +16,8 @@ public:
     Worker(int id);
     void operator()() const;
     template <typename Iterator, typename T>
-    void calculateSum(Iterator first, Iterator last, T& result) {
+    static void calculateSum(Iterator first, Iterator last, T& result) {
+        // this->operator()();
         result = accumulate(first, last, 0);
     }
 };

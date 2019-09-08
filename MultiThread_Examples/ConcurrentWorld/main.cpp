@@ -53,15 +53,14 @@ T parallel_calculateSum(Iterator first, Iterator last, T initValue = 0) {
     std::vector<T> results(numThreads, 0);
     std::vector<std::thread> threads(numThreads - 1);
     Iterator blockStart{first};
-    Worker worker(5);
     for (int i = 0; i < (numThreads - 1); ++i) {
         Iterator blockEnd{blockStart};
 
         std::advance(blockEnd, entriesPerBlock);
-        threads[i] = std::thread(&Worker::calculateSum<Iterator, T>, &worker, blockStart, blockEnd, std::ref(results[i]));
+        threads[i] = std::thread(&Worker::calculateSum<Iterator, T>, blockStart, blockEnd, std::ref(results[i]));
         std::advance(blockStart, entriesPerBlock);
     }
-    worker.calculateSum<Iterator, T>(blockStart, last, results[numThreads - 1]);
+    Worker::calculateSum<Iterator, T>(blockStart, last, results[numThreads - 1]);
 
     for (std::thread& threadI : threads) {
         threadI.join();
