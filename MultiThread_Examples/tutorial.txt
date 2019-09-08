@@ -12,3 +12,4 @@ You can check the compiler that support C++11 standard at https://en.cppreferenc
 Headers:
  - <thread> std::thread
 ------------------------------------------------------------------------------------------------------------------------------------
+ConcurrentWorld example: basic actions for creating and managing std::thread
