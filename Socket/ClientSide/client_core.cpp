@@ -80,7 +80,7 @@ void Client_Core::handleReceiveStream() {
     while (true) {
         uint8_t* data = new uint8_t[4];
         read(clientFD, data, 4);
-        size_t framSize = *data;
+        size_t framSize = *(uint32_t*)data;
         std::cout << "Framsize " << framSize << std::endl;
         shared_ptr<uint8_t[]> messageData{new uint8_t[framSize]};
         BufferWrapper wrap(messageData.get(), framSize);
