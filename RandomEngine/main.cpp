@@ -19,9 +19,11 @@ using std::endl;
 using std::random_device;
 using std::seed_seq;
 using std::string;
+using std::uniform_int_distribution;
 using std::vector;
 #define MAX_SESSION_CURSOR ((uint16_t(int16_t(-1)) / 15) * 15 - 1)
 #define seperatorBeginEnd cout << endl << "-------------------------------------------------------------" << endl
+#define src(i) #i
 
 void testObtaningRandomSeeds(int numSeeds) {
     // std::random_device is a uniformly-distributed integer random number generator
@@ -83,6 +85,7 @@ void testSeedSeq(size_t numGenValue = 10) {
 }
 
 void testDefaultRandomNumGenerator() {
+    seperatorBeginEnd;
     // std::default_random_engine is a general-purpose of random uintegers
     default_random_engine randEngine1;        // default seed (the random sequences will always be the same)
     default_random_engine randEngine2{2610};  // supply seed by yourself but still fixed
@@ -91,13 +94,18 @@ void testDefaultRandomNumGenerator() {
     default_random_engine randEngine3{randDev()};  // use seed created by random_device -> the sequence will be a suprise everytime
     seed_seq seedSeq{randDev(), randDev(), randDev()};
     default_random_engine randEngine4{seedSeq};  // or we could use a seed_seq as parameter
+
+    // Let use some distribution class
+    uniform_int_distribution<int64_t> uIntDis;
+    cout << endl << src(uniform_int_distribution<int64_t>) << " range random: [" << uIntDis.min() << " - " << uIntDis.max() << "]" << endl;
+    seperatorBeginEnd;
 }
 int main(int argc, char* argv[]) {
     // gen single seed value
     testObtaningRandomSeeds(10);
     // gen seed sequences
     testSeedSeq();
-    int t = MAX_SESSION_CURSOR;
-    std::cout << " MAX" << t;
+    // test random engine with specific distributions
+    testDefaultRandomNumGenerator();
     return 0;
 }
