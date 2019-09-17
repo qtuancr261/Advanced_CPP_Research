@@ -11,10 +11,14 @@ You can check the compiler that support C++11 standard at https://en.cppreferenc
 ------------------------------------------------------------------------------------------------------------------------------------
 Headers:
  - <thread> std::thread
+ - <mutex> std::mutex | std::lock_guard
 ------------------------------------------------------------------------------------------------------------------------------------
 ConcurrentWorld example: basic actions for creating and managing std::thread
 ------------------------------------------------------------------------------------------------------------------------------------
-ProtectingDataMutex: using mutex in C++11 to protect shared data between threads
+ProtectingDataMutex: using mutex (mutual excusion) in C++11 to protect shared data between threads
  - Race Conditions: occur where completing an operation requires modification of two or more distinct pieces of data, such as the two link pointer in double-linked list node, another thread could potentially access the data structure
 when only one of them has been completed.
- - Often very hard to find and hard to duplicate because it is generallu timing sensitive
+ - Often very hard to find and hard to duplicate because it is generally timing sensitive 
+ - Using:
+   -> manually: creating an instance of std::mutex and call its member function lock() - unlock() (shouldn't use this way)
+   -> practically: use std::lock_guard for a std::mutex , it will lock the associate mutex by the std::lock_guard contructor and unlock by the destructor
