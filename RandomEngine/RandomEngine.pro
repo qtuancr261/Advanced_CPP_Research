@@ -16,3 +16,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     main.cpp
+
+CONFIG += link_pkgconfig
+PKGCONFIG += benchmark

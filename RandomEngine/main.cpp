@@ -7,11 +7,12 @@
  * Testing stl generating random numbers
  */
 
+#include <benchmark/benchmark.h>
+#include <cstring>
 #include <iostream>
 #include <iterator>
 #include <random>
 #include <vector>
-
 using std::copy;
 using std::cout;
 using std::default_random_engine;
@@ -21,6 +22,7 @@ using std::seed_seq;
 using std::string;
 using std::uniform_int_distribution;
 using std::vector;
+
 #define MAX_SESSION_CURSOR ((uint16_t(int16_t(-1)) / 15) * 15 - 1)
 #define seperatorBeginEnd cout << endl << "-------------------------------------------------------------" << endl
 #define src(i) #i
@@ -100,12 +102,29 @@ void testDefaultRandomNumGenerator() {
     cout << endl << src(uniform_int_distribution<int64_t>) << " range random: [" << uIntDis.min() << " - " << uIntDis.max() << "]" << endl;
     seperatorBeginEnd;
 }
-int main(int argc, char* argv[]) {
-    // gen single seed value
-    testObtaningRandomSeeds(10);
-    // gen seed sequences
-    testSeedSeq();
-    // test random engine with specific distributions
-    testDefaultRandomNumGenerator();
-    return 0;
+
+static void BM_memcpy(benchmark::State& state) {
+    char* src{new char[state.range(0)]};
+    char* dst{new char[state.range(0)]};
+    memset(src, 'z', state.range(0));
+    for (auto _ : state) {
+        memcpy(dst, src, state.range(0));
+    }
+    state.SetBytesProcessed(static_cast<int64_t>(state.range(0) * state.iterations()));
+    state.SetItemsProcessed(state.iterations());
+    delete[] src;
+    delete[] dst;
 }
+// BENCHMARK(BM_memcpy)->Arg(8)->Arg(16)->Arg(32)->Arg(64)->Arg(128)->Arg(512);
+BENCHMARK(BM_memcpy)->Range(1 << 3, 1 << 10);
+BENCHMARK_MAIN();
+
+// int main(int argc, char* argv[]) {
+//    // gen single seed value
+//    testObtaningRandomSeeds(10);
+//    // gen seed sequences
+//    testSeedSeq();
+//    // test random engine with specific distributions
+//    testDefaultRandomNumGenerator();
+//    return 0;
+//}
