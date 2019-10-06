@@ -9,6 +9,7 @@
 
 #include <benchmark/benchmark.h>
 #include <cstring>
+#include <ctime>
 #include <iostream>
 #include <iterator>
 #include <random>
@@ -17,15 +18,22 @@ using std::copy;
 using std::cout;
 using std::default_random_engine;
 using std::endl;
+using std::rand;
 using std::random_device;
 using std::seed_seq;
+using std::srand;
 using std::string;
+using std::time;
 using std::uniform_int_distribution;
 using std::vector;
 
 #define MAX_SESSION_CURSOR ((uint16_t(int16_t(-1)) / 15) * 15 - 1)
 #define seperatorBeginEnd cout << endl << "-------------------------------------------------------------" << endl
 #define src(i) #i
+#define INIT_BENCHMARK_USER()                                           \
+    ::benchmark::Initialize(&argc, argv);                               \
+    if (::benchmark::ReportUnrecognizedArguments(argc, argv)) return 1; \
+    ::benchmark::RunSpecifiedBenchmarks()
 
 void testObtaningRandomSeeds(int numSeeds) {
     // std::random_device is a uniformly-distributed integer random number generator
@@ -115,16 +123,37 @@ static void BM_memcpy(benchmark::State& state) {
     delete[] src;
     delete[] dst;
 }
-// BENCHMARK(BM_memcpy)->Arg(8)->Arg(16)->Arg(32)->Arg(64)->Arg(128)->Arg(512);
-BENCHMARK(BM_memcpy)->Range(1 << 3, 1 << 10);
-BENCHMARK_MAIN();
+static void BM_rand(benchmark::State& state) {
+    std::srand(time(nullptr));
+    for (auto _ : state) {
+        int randNum = rand();
+    }
+    //    while (state.KeepRunning()) {
+    //        int randNum = rand();
+    //    }
+}  // BENCHMARK(BM_memcpy)->Arg(8)->Arg(16)->Arg(32)->Arg(64)->Arg(128)->Arg(512);
 
-// int main(int argc, char* argv[]) {
-//    // gen single seed value
-//    testObtaningRandomSeeds(10);
-//    // gen seed sequences
-//    testSeedSeq();
-//    // test random engine with specific distributions
-//    testDefaultRandomNumGenerator();
-//    return 0;
-//}
+static void BM_random_device(benchmark::State& state) {
+    random_device randDev;
+    for (auto _ : state) {
+        int randNum = randDev();
+    }
+    //    while (state.KeepRunning()) {
+    //        int randNum = randDev();
+    //    }
+}
+// BENCHMARK(BM_memcpy)->Range(1 << 3, 1 << 10);
+BENCHMARK(BM_rand);
+BENCHMARK(BM_random_device);
+// BENCHMARK_MAIN();
+
+int main(int argc, char* argv[]) {
+    // gen single seed value
+    testObtaningRandomSeeds(10);
+    // gen seed sequences
+    testSeedSeq();
+    // test random engine with specific distributions
+    testDefaultRandomNumGenerator();
+    INIT_BENCHMARK_USER();
+    return 0;
+}
