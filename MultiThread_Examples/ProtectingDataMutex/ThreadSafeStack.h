@@ -12,6 +12,8 @@
 #include <mutex>
 #include <stack>
 #include <thread>
+using std::shared_ptr;
+using std::make_shared;
 class stack_empty : public std::exception {
 private:
     static inline std::string message{"Stack empty"};
@@ -52,6 +54,14 @@ public:
         if (_data.empty()) throw stack_empty();
         poppedValue = _data.top();
         _data.pop();
+    }
+
+    shared_ptr<T> pop() {
+        std::lock_guard<std::mutex> lockData{_dataMutex};
+        if (_data.empty()) throw stack_empty();
+        shared_ptr<T> topValue{make_shared<T>(_data.top())};
+        _data.pop();
+        return topValue;
     }
 };
 #endif  // THREADSAFESTACK_H

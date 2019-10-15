@@ -37,6 +37,7 @@ int main() {
     cout << "Hello World!" << endl;
     ThreadSafeStack<int> testStack;
     int popValue = 0;
-    testStack.pop(popValue);
+    //testStack.pop(popValue);
+    testStack.pop();
     return 0;
 }
