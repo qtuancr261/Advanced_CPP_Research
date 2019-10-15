@@ -4,20 +4,21 @@
  *
  * Created on 8/9/2019
  */
-#include <iostream>
-#include <vector>
-#include <mutex>
 #include <algorithm>
-
-using std::vector;
+#include <iostream>
+#include <mutex>
+#include <vector>
+#include "ThreadSafeStack.h"
 using std::lock_guard;
 using std::mutex;
+using std::vector;
 
 using namespace std;
 class GuardVec {
 private:
     vector<int> _data;
     mutex _dataMutex;
+
 public:
     GuardVec() = default;
     ~GuardVec() = default;
@@ -28,11 +29,14 @@ public:
 
     bool isValueValid(int lookupValue) {
         lock_guard<mutex> rLock{_dataMutex};
-	return (std::find(std::begin(_data), std::end(_data), lookupValue) != std::end(_data));
+        return (std::find(std::begin(_data), std::end(_data), lookupValue) != std::end(_data));
     }
 };
 
 int main() {
     cout << "Hello World!" << endl;
+    ThreadSafeStack<int> testStack;
+    int popValue = 0;
+    testStack.pop(popValue);
     return 0;
 }

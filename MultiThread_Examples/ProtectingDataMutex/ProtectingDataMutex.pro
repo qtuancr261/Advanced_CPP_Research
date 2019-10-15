@@ -1,5 +1,5 @@
 TEMPLATE = app
-CONFIG += console c++14
+CONFIG += console c++17
 CONFIG -= app_bundle
 CONFIG -= qt
 
@@ -8,3 +8,7 @@ SOURCES += \
 
 HEADERS += \
     ThreadSafeStack.h
+LIBS += \
+        -lpthread \
+        -ldl \
+        -lrt

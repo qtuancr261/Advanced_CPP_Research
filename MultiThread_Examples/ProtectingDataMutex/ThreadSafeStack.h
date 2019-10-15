@@ -12,18 +12,30 @@
 #include <mutex>
 #include <stack>
 #include <thread>
+class stack_empty : public std::exception {
+private:
+    static inline std::string message{"Stack empty"};
+
+public:
+    stack_empty() = default;
+    const char* what() const noexcept { return message.c_str(); }
+    ~stack_empty() = default;
+};
+
 template <typename T>
 class ThreadSafeStack {
 private:
     std::stack<T> _data;
     std::mutex _dataMutex;
+
+public:
     ThreadSafeStack() = default;
     ThreadSafeStack(const ThreadSafeStack& source) {
         std::lock_guard<std::mutex> lockData{source._dataMutex};
         _data = source._data;
     }
     ThreadSafeStack& operator=(const ThreadSafeStack& source) = delete;
-    ~ThreadSafeStack() = delete;
+    ~ThreadSafeStack() = default;
 
     bool isEmpty() const {
         std::lock_guard<std::mutex> lockData{_dataMutex};
@@ -37,7 +49,7 @@ private:
 
     void pop(T& poppedValue) {
         std::lock_guard<std::mutex> lockData{_dataMutex};
-        if (_data.empty()) throw std::exception();
+        if (_data.empty()) throw stack_empty();
         poppedValue = _data.top();
         _data.pop();
     }
