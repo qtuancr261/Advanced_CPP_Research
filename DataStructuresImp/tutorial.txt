@@ -3,7 +3,17 @@ C++11 Data Structures Tips
 ------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------
 Data structure alignment:
- - struct __attribute__((packed))
-   => packed means it will use the smallest possible space for struct
+ - struct __attribute__((packed)) (GCC compiler)
+   => packed means it will use the smallest possible space for struct (not padding)
+   ##############################
+   struct StructA {
+    int8_t data1;
+    int64_t data2;
+   }; // 16 bytes - auto padding 
+   ##############################
+   struct __attribute__((packed)) StructB {
+    int8_t data1;
+    int64_t data2;
+   }; // 9 bytes - smallest space 
 
 
