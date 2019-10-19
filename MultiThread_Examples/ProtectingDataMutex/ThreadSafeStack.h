@@ -8,12 +8,12 @@
 #define THREADSAFESTACK_H
 
 #include <exception>
+#include <limits>
 #include <memory>
 #include <mutex>
 #include <stack>
-#include <thread>
-using std::shared_ptr;
 using std::make_shared;
+using std::shared_ptr;
 class stack_empty : public std::exception {
 private:
     static inline std::string message{"Stack empty"};

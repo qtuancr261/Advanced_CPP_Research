@@ -9,6 +9,7 @@
 #include <mutex>
 #include <vector>
 #include "ThreadSafeStack.h"
+#include "logictest/LogicThreadSafeStack.h"
 using std::lock_guard;
 using std::mutex;
 using std::vector;
@@ -36,8 +37,9 @@ public:
 int main() {
     cout << "Hello World!" << endl;
     ThreadSafeStack<int> testStack;
+    LogicTestThreadSafeStack<int>::testPush(10, 10000, 2);
     int popValue = 0;
-    //testStack.pop(popValue);
+    // testStack.pop(popValue);
     testStack.pop();
     return 0;
 }

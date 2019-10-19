@@ -7,7 +7,8 @@ SOURCES += \
         main.cpp
 
 HEADERS += \
-    ThreadSafeStack.h
+    ThreadSafeStack.h \
+    logictest/LogicThreadSafeStack.h
 LIBS += \
         -lpthread \
         -ldl \
