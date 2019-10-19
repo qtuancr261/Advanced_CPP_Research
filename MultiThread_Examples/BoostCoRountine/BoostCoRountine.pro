@@ -6,4 +6,5 @@ CONFIG -= qt
 SOURCES += \
         main.cpp
 #INCLUDEPATH += $$PWD/../zboost/inc
-LIBS += -lboost_system
+LIBS += -lboost_system \
+        -lboost_coroutine
