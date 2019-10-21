@@ -44,5 +44,9 @@ int main() {
         // relinquish control to the getNextEntry coroutine
         func();
     }
+    /* Asymmetric coroutine give us two condition: each one has unidirectional data transfer 
+     * case 1: the caller pull data from the callee | callee push data to the caller
+     * case 2: the caller push data to the callee instead | the callee pull data from the caller
+     */
     return 0;
 }
