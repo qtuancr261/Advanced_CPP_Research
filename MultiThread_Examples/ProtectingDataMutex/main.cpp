@@ -36,10 +36,8 @@ public:
 
 int main() {
     cout << "Hello World!" << endl;
-    ThreadSafeStack<int> testStack;
-    LogicTestThreadSafeStack<int>::testPush(10, 10000, 2);
-    int popValue = 0;
+
     // testStack.pop(popValue);
-    testStack.pop();
+    LogicTestThreadSafeStack<int>::testPush(1, 300);
     return 0;
 }
