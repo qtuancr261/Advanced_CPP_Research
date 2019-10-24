@@ -63,5 +63,10 @@ public:
         _data.pop();
         return topValue;
     }
+
+    size_t size() {
+        std::lock_guard<std::mutex> lockData{_dataMutex};
+        return _data.size();
+    }
 };
 #endif  // THREADSAFESTACK_H

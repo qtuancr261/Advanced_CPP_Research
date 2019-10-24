@@ -25,6 +25,7 @@ public:
 
 public:
     static void _pushData(uint64_t min, uint64_t max, ThreadSafeStack<T>& testedObject) {
+        std::cout << "push " << min << ":" << max << std::endl;
         for (uint64_t i{min}; i < max; ++i) {
             // make sure we can cast it to T
             T entry{static_cast<T>(i)};
@@ -49,14 +50,15 @@ public:
         std::cout << "Entries per thread: " << entriesPerThread << std::endl;
         std::vector<thread> threads;
         uint64_t midRange{};
-        threads.reserve(numThreads);
-        for (int idx{}; idx < (numThreads - 1); ++idx) {
+        //threads.reserve(numThreads);
+        for (int idx{}; idx < numThreads; ++idx) {
             midRange = minRange + entriesPerThread;
-            threads[idx] = thread{&LogicTestThreadSafeStack::_pushData, minRange, midRange, std::ref(testObject)};
+	    if (idx == numThreads - 1)
+                threads.push_back(thread{&LogicTestThreadSafeStack::_pushData, minRange, maxRange, std::ref(testObject)});
+	    else
+            	threads.push_back(thread{&LogicTestThreadSafeStack::_pushData, minRange, midRange, std::ref(testObject)});
             minRange += entriesPerThread;
         }
-        std::cout << "Min " << minRange << std::endl;
-        threads[numThreads - 1] = thread{&LogicTestThreadSafeStack::_pushData, minRange, maxRange, std::ref(testObject)};
         for (std::thread& threadX : threads) {
             threadX.join();
         }
