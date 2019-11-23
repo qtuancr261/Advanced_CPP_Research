@@ -68,5 +68,17 @@ public:
         std::lock_guard<std::mutex> lockData{_dataMutex};
         return _data.size();
     }
+
+    void swap(ThreadSafeStack& other) {
+        if (this == &other) return;
+        // std::lock function can lock two or more mutexes at one without risk of deadlock
+        std::lock(this->_dataMutex, other._dataMutex);
+        // we use std::adopt_lock to indicate to the std::lock_guard object
+        // that the mutexes are already lock and they should kust adopt the ownership
+        // of the existing lock on the mutex rather than attempt to lock it again
+        std::lock_guard<std::mutex> lock1(this->_dataMutex, std::adopt_lock);
+        std::lock_guard<std::mutex> lock2(other._dataMutex, std::adopt_lock);
+        std::swap(this->_data, other._data);
+    }
 };
 #endif  // THREADSAFESTACK_H
