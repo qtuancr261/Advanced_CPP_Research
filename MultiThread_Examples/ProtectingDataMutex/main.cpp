@@ -9,6 +9,7 @@
 #include <mutex>
 #include <vector>
 #include "ThreadSafeStack.h"
+#include "hierarchical_mutex.h"
 #include "logictest/LogicThreadSafeStack.h"
 using std::lock_guard;
 using std::mutex;
@@ -34,6 +35,8 @@ public:
     }
 };
 
+thread_local uint32_t hierarchical_mutex::_thisThreadHierarchyValue{std::numeric_limits<uint32_t>::max()};
+
 int main() {
     cout << "Hello World!" << endl;
 
@@ -42,5 +45,9 @@ int main() {
     ThreadSafeStack<int> t1;
     ThreadSafeStack<int> t2;
     t1.swap(t2);
+
+    hierarchical_mutex mutex1{10000};
+    lock_guard lock1{mutex1};
+
     return 0;
 }

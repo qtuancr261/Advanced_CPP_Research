@@ -7,7 +7,10 @@
 #ifndef HIERARCHICAL_MUTEX_H
 #define HIERARCHICAL_MUTEX_H
 
+#include <iostream>
 #include <mutex>
+using std::clog;
+using std::endl;
 using std::lock_guard;
 using std::mutex;
 // Implement a basic lock hierarchy concept for c++
@@ -20,12 +23,21 @@ class hierarchical_mutex {
 private:
     mutex _internalMutex;
     uint32_t const _hierarchyValue;
-    uint32_t _pre_hierarchyValue;
+    uint32_t _preHierarchyValue;
+
+public:
     static thread_local uint32_t _thisThreadHierarchyValue;
 
 public:
     explicit hierarchical_mutex(uint32_t value);
     void checkHierarchyViolation();
+    void updateHierarchyValue();
+
+public:
+    // mutex concept
+    void lock();
+    void unlock();
+    bool try_lock();
 };
 
 #endif  // HIERARCHICAL_MUTEX_H
