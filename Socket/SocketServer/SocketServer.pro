@@ -35,15 +35,15 @@ HEADERS += \
 #INCLUDEPATH += ../zpoco/inc
 #LIBS += ../../zpoco/lib/libzpoco.a
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../zpoco/lib/release/ -lzpocod
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../zpoco/lib/debug/ -lzpocod
-else:unix: LIBS += -L$$PWD/../zpoco/lib/ -lzpocod
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../poco/lib/release/ -lpocod
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../poco/lib/debug/ -lpocod
+else:unix: LIBS += -L$$PWD/../poco/lib/ -lpocod
 
-INCLUDEPATH += $$PWD/../zpoco/inc
-DEPENDPATH += $$PWD/../zpoco/inc
+INCLUDEPATH += $$PWD/../poco/inc
+DEPENDPATH += $$PWD/../poco/inc
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../zpoco/lib/release/libzpocod.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../zpoco/lib/debug/libzpocod.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../zpoco/lib/release/zpocod.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../zpoco/lib/debug/zpocod.lib
-else:unix: PRE_TARGETDEPS += $$PWD/../zpoco/lib/libzpocod.a
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../poco/lib/release/libpocod.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../poco/lib/debug/libpocod.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../poco/lib/release/pocod.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../poco/lib/debug/pocod.lib
+else:unix: PRE_TARGETDEPS += $$PWD/../poco/lib/libpocod.a
