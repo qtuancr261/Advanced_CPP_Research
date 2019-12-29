@@ -44,10 +44,7 @@ int main() {
     LogicTestThreadSafeStack<int>::testPush(1, 300000);
     ThreadSafeStack<int> t1;
     ThreadSafeStack<int> t2;
-    t1.swap(t2);
-
-    hierarchical_mutex mutex1{10000};
-    lock_guard lock1{mutex1};
+    t1.swapV1(t2);
 
     return 0;
 }

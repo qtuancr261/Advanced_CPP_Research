@@ -69,7 +69,7 @@ public:
         return _data.size();
     }
 
-    void swap(ThreadSafeStack& other) {
+    void swapV1(ThreadSafeStack& other) {
         if (this == &other) return;
         // std::lock function can lock two or more mutexes at one without risk of deadlock
         std::lock(this->_dataMutex, other._dataMutex);
@@ -78,6 +78,17 @@ public:
         // of the existing lock on the mutex rather than attempt to lock it again
         std::lock_guard<std::mutex> lock1(this->_dataMutex, std::adopt_lock);
         std::lock_guard<std::mutex> lock2(other._dataMutex, std::adopt_lock);
+        std::swap(this->_data, other._data);
+    }
+
+    void swapV2(ThreadSafeStack& other) {
+        if (this == &other) return;
+        // the same approach as swapV1 by using std::unique_lock and std::defer_lock
+        // std::defer_lock : do not acquire ownership of the mutex
+        std::unique_lock<std::mutex> lock1(this->_dataMutex, std::defer_lock);  // leave the mutex unlocked
+        std::unique_lock<std::mutex> lock2(this->_dataMutex, std::defer_lock);
+        // we can pass std::unique_lock to std::lock function
+        std::lock(lock1, lock2);  // we lock the two std::unique_lock here (it has lock(), unlock(), try_lock() as a normal mutex)
         std::swap(this->_data, other._data);
     }
 };
