@@ -6,12 +6,22 @@
  */
 #ifndef LOGICHIERARCHYMUTEX_H
 #define LOGICHIERARCHYMUTEX_H
-
-
-class LogicHierarchyMutex
-{
+#include <thread>
+#include "hierarchical_mutex.h"
+class LogicHierarchyMutex {
 public:
     LogicHierarchyMutex();
+
+private:
+    static void _doSomethingOnLowLevel();
+    static void _doSomethingOnMiddleLevel();
+    static void _doSomethingOnTopLevel();
+
+public:
+    static void doTheRightThings();
+    static void doTheWrongThings();
+    static void runHtoLThreadHierarchy();
+    static void runLtoHThreadHierarchy();
 };
 
-#endif // LOGICHIERARCHYMUTEX_H
+#endif  // LOGICHIERARCHYMUTEX_H

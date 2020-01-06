@@ -11,6 +11,7 @@
 #include "ThreadSafeStack.h"
 #include "hierarchical_mutex.h"
 #include "logictest/LogicThreadSafeStack.h"
+#include "logictest/logichierarchymutex.h"
 using std::lock_guard;
 using std::mutex;
 using std::vector;
@@ -45,6 +46,8 @@ int main() {
     ThreadSafeStack<int> t1;
     ThreadSafeStack<int> t2;
     t1.swapV1(t2);
-
+    LogicHierarchyMutex::runHtoLThreadHierarchy();
+    LogicHierarchyMutex::runLtoHThreadHierarchy();
+    // test hierarchy mutex with two thread
     return 0;
 }
