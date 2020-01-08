@@ -26,6 +26,8 @@ struct funct {
         }
         return true;
     }
+
+    static bool testThis() { return true; }
 };
 int say(string& message) {
     cout << message << endl;
@@ -86,6 +88,9 @@ int main() {
     //
     thread thread_4{&funct::doTheSameThingAsFunctor, &F1};
     thread_4.join();
+
+    //
+    thread thread_x(&funct::testThis);
 
     string message{"Hello"};
     // By default the arguments are copied into internal storage
