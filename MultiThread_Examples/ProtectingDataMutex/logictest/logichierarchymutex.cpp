@@ -37,7 +37,12 @@ void LogicHierarchyMutex::doTheRightThings() {
 void LogicHierarchyMutex::doTheWrongThings() {
     hierarchical_mutex curMutex{10};
     std::lock_guard<hierarchical_mutex> lock(curMutex);
-    _doSomethingOnLowLevel();
+    try {
+        _doSomethingOnLowLevel();
+    } catch (std::logic_error& error) {
+        std::cerr << error.what() << std::endl;
+    }
+
 }
 
 void LogicHierarchyMutex::runHtoLThreadHierarchy() {
