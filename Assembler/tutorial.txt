@@ -1,0 +1,19 @@
+######################################
+X86/IA-32 architecutures (AVR 8086)
+######################################
+- General purpose registers (8 32-bit GRPs)
+  + EAX: AX:16(AH:8|AL:8) accumulator
+  + EBX: ---------------  base
+  + ECX: ---------------  counter
+  + EDX: ---------------  data
+  + ESI: source index 
+  + EDI: destination index
+  + EBP: base pointer
+  + ESP: stack pointer
+
+- Common data types:
+  + Byte - 8 bits. exp: AL, BL, CL
+  + Word - 16 bits. exp: AX, BX, CX
+  + DWord - 32 bits. exp: EAX, EBX, ECX
+  + Quad word - 64 bits. (x86 architecture doesn't have 64-bit GPRs, it combine two 32-bit registers, usually EDX:EAX)
+ 
