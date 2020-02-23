@@ -50,13 +50,13 @@ public:
         std::cout << "Entries per thread: " << entriesPerThread << std::endl;
         std::vector<thread> threads;
         uint64_t midRange{};
-        //threads.reserve(numThreads);
+        // threads.reserve(numThreads); => don't do this
         for (int idx{}; idx < numThreads; ++idx) {
             midRange = minRange + entriesPerThread;
-	    if (idx == numThreads - 1)
+            if (idx == numThreads - 1)
                 threads.push_back(thread{&LogicTestThreadSafeStack::_pushData, minRange, maxRange, std::ref(testObject)});
-	    else
-            	threads.push_back(thread{&LogicTestThreadSafeStack::_pushData, minRange, midRange, std::ref(testObject)});
+            else
+                threads.push_back(thread{&LogicTestThreadSafeStack::_pushData, minRange, midRange, std::ref(testObject)});
             minRange += entriesPerThread;
         }
         for (std::thread& threadX : threads) {

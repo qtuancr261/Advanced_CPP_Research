@@ -9,6 +9,7 @@
 #include <mutex>
 #include <vector>
 #include "ThreadSafeStack.h"
+#include "benchtest/LazyInitBench.h"
 #include "hierarchical_mutex.h"
 #include "logictest/LogicThreadSafeStack.h"
 #include "logictest/logichierarchymutex.h"
@@ -46,8 +47,10 @@ int main() {
     ThreadSafeStack<int> t1;
     ThreadSafeStack<int> t2;
     t1.swapV1(t2);
+    // test hierarchy mutex with two thread
     LogicHierarchyMutex::runHtoLThreadHierarchy();
     LogicHierarchyMutex::runLtoHThreadHierarchy();
-    // test hierarchy mutex with two thread
+    // Benchmark
+    LazyInitBench::benchmarkCallAPI(4, 2000);
     return 0;
 }
