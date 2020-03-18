@@ -7,14 +7,16 @@ SOURCES += \
         benchtest/LazyInitBench.cpp \
         hierarchical_mutex.cpp \
         logictest/logichierarchymutex.cpp \
-        main.cpp
+        main.cpp \
+        utils/StopWatch.cpp
 
 HEADERS += \
     ThreadSafeStack.h \
     benchtest/LazyInitBench.h \
     hierarchical_mutex.h \
     logictest/LogicThreadSafeStack.h \
-    logictest/logichierarchymutex.h
+    logictest/logichierarchymutex.h \
+    utils/StopWatch.h
 LIBS += \
         -lpthread \
         -ldl \

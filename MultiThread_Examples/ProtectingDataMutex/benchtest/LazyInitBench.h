@@ -8,6 +8,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include "utils/StopWatch.h"
 class LazyInitBench {
 private:
     struct Connection {
