@@ -51,6 +51,6 @@ int main() {
     LogicHierarchyMutex::runHtoLThreadHierarchy();
     LogicHierarchyMutex::runLtoHThreadHierarchy();
     // Benchmark
-    LazyInitBench::benchmarkCallAPI(4, 200000000);
+    LazyInitBench::benchmarkCallAPI(2, 80000000);
     return 0;
 }
