@@ -99,7 +99,6 @@ public:
         allocElement->ptrNext = nullptr;
 
         size_t dataAddr = reinterpret_cast<size_t>(allocElement) + 8;
-        // return static_cast<T*> (dataAddr);
         return (T*)(dataAddr);
     }
 

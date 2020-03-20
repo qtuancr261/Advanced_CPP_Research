@@ -2,12 +2,12 @@
 #define MINIMALPOOLALLOC_H
 #include <iostream>
 template <typename T>
-struct pool_tallocator {
+struct mini_allocator {
     using value_type = T;
-    pool_tallocator() = default;
+    mini_allocator() = default;
 
     template <class U>
-    pool_tallocator(const pool_tallocator<U>&) {}
+    mini_allocator(const mini_allocator<U>&) {}
     T* allocate(size_t n, void const* = 0)
     {
         return reinterpret_cast<T*>(::operator new(n * sizeof(T)));
@@ -17,4 +17,15 @@ struct pool_tallocator {
         ::operator delete(ptr);
     }
 };
+
+template <typename T, typename U>
+inline bool operator ==(const mini_allocator<T>&, const mini_allocator<U>&) {
+    return std::is_same<T, U>::value;
+}
+
+template <typename T, typename U>
+inline bool operator !=(const mini_allocator<T>& a, const mini_allocator<U>& b) {
+    return !(a == b);
+}
+
 #endif // MINIMALPOOLALLOC_H
