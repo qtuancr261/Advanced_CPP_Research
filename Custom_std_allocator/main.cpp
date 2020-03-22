@@ -1,15 +1,16 @@
-#include "poolallocator.h"
-#include "minimalpoolalloc.h"
+#include <assert.h>
 #include <iostream>
 #include <set>
-#include <assert.h>
+#include "minimalalloc.h"
+#include "minimalpoolallocator.h"
+#include "poolallocator.h"
 using std::cout;
 using std::endl;
 using std::set;
 using EventSentHolder = set<long, std::less<long>, pool_allocator<long>>;
-using EventSentHolder_mini = set<long , std::less<long>, mini_allocator<long>>;
-int main()
-{
+using EventSentHolder_mini = set<long, std::less<long>, mini_allocator<long>>;
+using EventSentHolder_mini_pool = set<long, std::less<long>, mini_pool_allocator<long>>;
+int main() {
     EventSentHolder _eventSent;
     _eventSent.insert(10);
     _eventSent.insert(20);
@@ -20,5 +21,10 @@ int main()
 
     mini_allocator<int> c;
     assert(a != c && b == c);
+
+    EventSentHolder_mini_pool _eventSent2;
+    _eventSent2.insert(100);
+    _eventSent2.insert(200);
+    _eventSent2.insert(300);
     return 0;
 }
