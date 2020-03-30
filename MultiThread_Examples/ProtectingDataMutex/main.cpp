@@ -52,5 +52,16 @@ int main() {
     LogicHierarchyMutex::runLtoHThreadHierarchy();
     // Benchmark
     LazyInitBench::benchmarkCallAPI(2, 80000000);
+
+    std::mutex mutexA;
+
+    std::lock_guard<std::mutex> guard1{mutexA};
+    cout << "Ending guard 1" << endl;
+    // guard1.~lock_guard();
+    std::lock_guard<std::mutex> guard2{mutexA};
+    // Ok we have deadlock situation here
+    // Same thread lock an already locked mutex
+    cout << "Ending guard 2" << endl;
+    cout << "Ending" << endl;
     return 0;
 }
