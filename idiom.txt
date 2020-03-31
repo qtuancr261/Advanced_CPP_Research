@@ -1,0 +1,2 @@
+# COW: copy on write - Optimized C++ Chapter 6 Optimize Dynamically Allocated Variables
+# RVO: return value optimization - Optimized C++ Chapter 6 Optimize Dynamically Allocated Variables
