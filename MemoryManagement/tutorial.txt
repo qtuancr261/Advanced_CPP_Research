@@ -7,3 +7,15 @@ or
 1: ::<optional> delete expression
 or
 2: ::<optional> delete[] expression
+
+# High-Perf mem managers
+By default, all requests for storage pass through ::operator new() and released storage pass through ::operator delete()
+These functions form C++'s default memory manager. The default C++ memory manager must meet many demands:
+ - perform efficiently, cause it is likely to be hot
+ - work correctly in multithreaded programs. Access to data structures in the default mem manager must be serialized
+ - allocate many same-sized objects (like list nodes) efficiently
+ - allocate many differently sized objects (like strings) effieciently
+ - allocate very big data structures (I/O buffers, array of a million ints) as well as small data structures (pointers)
+ - be aware of alignment boundaries for pointers, cache line, virtual memory pages, at least for larger allocated memory blocks
+ - runtime performance must not degrade over time
+ - efficiently reuse memory returned to it
