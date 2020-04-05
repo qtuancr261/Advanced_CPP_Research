@@ -2,3 +2,8 @@
 1: ::<optional> new (placement-params)<optional> (type) initializer<optional> 
 or
 2: ::<optional> new (placement-params)<optional> type initializer<optional>
+
+# delete expression syntax:
+1: ::<optional> delete expression
+or
+2: ::<optional> delete[] expression
