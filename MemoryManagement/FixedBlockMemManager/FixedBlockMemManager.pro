@@ -7,4 +7,5 @@ SOURCES += \
         main.cpp
 
 HEADERS += \
-    FixedSizeBlock.h
+    FixedSizeBlock.h \
+    FixedSizeBlock_inl.h

@@ -6,6 +6,7 @@
  */
 #ifndef FIXEDSIZEBLOCK_H
 #define FIXEDSIZEBLOCK_H
+#include <cstddef>
 
 template <class Arena>
 class FixedBlockMemManager {
@@ -20,5 +21,22 @@ public:
     FixedBlockMemManager& operator=(const FixedBlockMemManager& source) = delete;
     // default destructor
     ~FixedBlockMemManager() = default;
+
+public:
+    void* allocate(size_t);
+    void deallocate(void*);
+    size_t blockSize() const;
+    size_t capacity() const;
+    bool isEmpty() const;
+    void clear();
+
+private:
+    struct freeBlock {
+        freeBlock* nextBlock;
+    };
+
+    freeBlock* _freeHead;
+    size_t _blockSize;
+    Arena _arena;
 };
 #endif  // FIXEDSIZEBLOCK_H
