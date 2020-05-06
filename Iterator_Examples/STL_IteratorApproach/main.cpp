@@ -47,9 +47,15 @@ void testSwapSTLIter(Iter A, Iter B) {
     *A = *B;
     *B = tmp;
 }
+// The iterator template
+class MyIter : public std::iterator<std::random_access_iterator_tag, int> {
+public:
+    MyIter() = default;
+};
 int main() {
     std::vector<std::string> strS{"tuan", "thieu", "2020", "STL"};
     testSwapSTLIter(strS.begin(), strS.begin() + 2);  // type deduced
     testSwapSTLIter(std::begin(strS), std::begin(strS) + 2);
+
     return 0;
 }
