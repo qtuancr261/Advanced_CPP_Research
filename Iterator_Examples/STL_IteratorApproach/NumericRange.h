@@ -10,7 +10,10 @@
 #include <cstdlib>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 //
+using namespace std::rel_ops;
+
 template <typename T>
 class NumericIterator;
 
@@ -68,5 +71,41 @@ private:
 
 public:
     explicit NumericIterator(NumericRange<T>& srcRange) : _range{srcRange}, _value{srcRange.begin()} {}
+    // Assigment op
+    NumericIterator& operator=(const NumericIterator& src) {
+        _range = src._range;
+        _value = src._value;
+    }
+
+    // Dereference
+    T& operator*() {
+        if (_value == _range._start + _range._count * _range._step) {
+            std::__throw_logic_error("Couldn't dereference an end iterator");
+        }
+        return _value;
+    }
+
+    // Prefix increment op
+    NumericIterator& operator++() {
+        if (_value == _range._start + _range._count * _range._step) {
+            std::__throw_logic_error("Couldn't increase an end iterator");
+        }
+        _value += _range._step;
+        return *this;
+    }
+
+    // Postfix increment
+    NumericIterator operator++(int) {
+        if (_value == _range._start + _range._count * _range._step) {
+            std::__throw_logic_error("Couldn't increase an end iterator");
+        }
+        NumericIterator temp = *this;
+        _value += _range._step;
+        return temp;
+    }
+
+    // Comparisons
+    bool operator<(const NumericIterator& iter) { return _value < iter._value; }
+    bool operator==(const NumericIterator& iter) { return _value == iter._value; }
 };
 #endif  // NUMERICRANGE_H

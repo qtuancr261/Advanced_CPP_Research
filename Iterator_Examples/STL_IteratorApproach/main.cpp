@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iterator>
 #include <vector>
+#include "NumericRange.h"
 using namespace std;
 
 template <typename Iter>
