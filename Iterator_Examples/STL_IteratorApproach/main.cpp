@@ -8,7 +8,6 @@
 #include <iterator>
 #include <vector>
 #include "NumericRange.h"
-using namespace std;
 
 template <typename Iter>
 void testSwapMyITer(Iter A, Iter B) {
@@ -54,9 +53,15 @@ public:
     MyIter() = default;
 };
 int main() {
+    using namespace std::rel_ops;
+
     std::vector<std::string> strS{"tuan", "thieu", "2020", "STL"};
     testSwapSTLIter(strS.begin(), strS.begin() + 2);  // type deduced
     testSwapSTLIter(std::begin(strS), std::begin(strS) + 2);
-
+    NumericRange<int> range{10, 5, 20};
+    NumericIterator<int> first{range.begin()};
+    NumericIterator<int> last{range.end()};
+    // output the range
+    std::copy(first, last, std::ostream_iterator<int>(std::cout, "-"));
     return 0;
 }

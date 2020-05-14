@@ -12,8 +12,6 @@
 #include <type_traits>
 #include <utility>
 //
-using namespace std::rel_ops;
-
 template <typename T>
 class NumericIterator;
 
@@ -40,7 +38,7 @@ public:
     // the end iterator for the range
     NumIterator end() {
         NumIterator endIter{*this};
-        endIter.value = _start + _count * _step;
+        endIter._value = _start + _count * _step;
         return endIter;
     }
 };
@@ -70,7 +68,7 @@ private:
     T _value;
 
 public:
-    explicit NumericIterator(NumericRange<T>& srcRange) : _range{srcRange}, _value{srcRange.begin()} {}
+    explicit NumericIterator(NumericRange<T>& srcRange) : _range{srcRange}, _value{srcRange._start} {}
     // Assigment op
     NumericIterator& operator=(const NumericIterator& src) {
         _range = src._range;
@@ -105,7 +103,9 @@ public:
     }
 
     // Comparisons
-    bool operator<(const NumericIterator& iter) { return _value < iter._value; }
-    bool operator==(const NumericIterator& iter) { return _value == iter._value; }
+    bool operator<(const NumericIterator& iter) const { return _value < iter._value; }
+    bool operator==(const NumericIterator& iter) const { return _value == iter._value; }
+    bool operator!=(const NumericIterator& iter) const { return _value != iter._value; }
+    bool operator>(const NumericIterator& iter) const { return _value > iter._value; }
 };
 #endif  // NUMERICRANGE_H
