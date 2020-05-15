@@ -4,8 +4,10 @@
  *
  * Created on 26/4/2020
  */
+#include <algorithm>
 #include <iostream>
 #include <iterator>
+#include <numeric>
 #include <vector>
 #include "NumericRange.h"
 
@@ -63,5 +65,14 @@ int main() {
     NumericIterator<int> last{range.end()};
     // output the range
     std::copy(first, last, std::ostream_iterator<int>(std::cout, "-"));
+    // cal sum
+    std::cout << std::endl << "Sum: " << std::accumulate(first, last, 0);
+    // init container from range
+    NumericRange<double> rangeD{1000.0, 0.5, 10};
+    std::vector<double> numD{rangeD.begin(), rangeD.end()};
+    for (auto num : numD) {
+        std::cout << "D: " << num << " - ";
+    }
+
     return 0;
 }
