@@ -5,3 +5,7 @@ CONFIG -= qt
 
 SOURCES += \
         main.cpp
+LIBS += \
+        -lpthread \
+        -ldl \
+        -lrt
