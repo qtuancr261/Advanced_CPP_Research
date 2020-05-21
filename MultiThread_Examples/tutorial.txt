@@ -10,9 +10,16 @@ With the release of the new C++ standard, there is not only a brandnew thread-aw
 You can check the compiler that support C++11 standard at https://en.cppreference.com/w/cpp/compiler_support
 ------------------------------------------------------------------------------------------------------------------------------------
 Headers:
- - <thread> std::thread
- - <mutex> std::mutex | std::lock_guard | std::unique_lock
-------------------------------------------------------------------------------------------------------------------------------------
+ - <thread> std::thread | std::this_thread
+ - <mutex> std::mutex | std::lock_guard | std::unique_lock | std::call_once | std::once_flag
+ - <chrono> std::chrono::miliseconds
+ - <condition_variable> std::condition_variable
+----------------------------------------------------------------------------------------------------------------------------------------
+Libraries to be linked into the project:
+ - ldl: for dynamic linking library
+ - lrt: POSIX realtime extension library
+ - lpthread: POSIX Pthread library
+----------------------------------------------------------------------------------------------------------------------------------------
 ConcurrentWorld example: basic actions for creating and managing std::thread
 ------------------------------------------------------------------------------------------------------------------------------------
 ProtectingDataMutex: using mutex (mutual excusion) in C++11 to protect shared data between threads
