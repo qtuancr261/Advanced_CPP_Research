@@ -13,7 +13,7 @@
 #include <random>
 #include <thread>
 std::random_device randSeed;
-std::mutex mutexQueue;
+std::mutex mutexJobsQueue;
 
 std::queue<uint32_t> jobsQueue;
 std::condition_variable jobCondition;
@@ -34,6 +34,11 @@ void prepareJobs(int seed) {
         uint32_t newJobs{randDis(randEng)};
         std::cout << "JobID: " << newJobs << std::endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        {
+            std::lock_guard<std::mutex> lock(mutexJobsQueue);
+            jobsQueue.push(newJobs);
+            jobCondition.notify_one();
+        }
     }
 }
 
@@ -44,6 +49,12 @@ int main() {
     std::seed_seq seedSeq{toDaySeed};
     seedSeq.generate(std::begin(threadSeeds), std::end(threadSeeds));
     std::copy(std::begin(threadSeeds), std::end(threadSeeds), std::ostream_iterator<uint32_t>(std::cout, " | "));
-    prepareJobs(threadSeeds[0]);
+    std::vector<std::thread> workers;
+    for (auto thrSeed : threadSeeds) {
+        workers.push_back(std::thread(prepareJobs, thrSeed));
+    }
+    for (auto& worker : workers) {
+        worker.join();
+    }
     return 0;
 }
