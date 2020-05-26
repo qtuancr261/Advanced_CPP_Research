@@ -42,6 +42,19 @@ void prepareJobs(int seed) {
     }
 }
 
+void processJobs() {
+	while (true) {
+        std::unique_lock<std::mutex> lock(mutexJobsQueue);
+        jobCondition.wait(lock, /* the condition being waited for */ [] { return !jobsQueue.empty(); });
+        uint32_t processJob{jobsQueue.front()};
+        jobsQueue.pop();
+        lock.unlock();
+        // processing data would be a time-consuming operation
+        // doing something with job
+        std::cout << "Process job " << processJob << std::endl;
+	}
+}
+
 int main() {
     std::vector<uint32_t> threadSeeds(std::thread::hardware_concurrency());
     auto toDaySeed{randSeed()};
