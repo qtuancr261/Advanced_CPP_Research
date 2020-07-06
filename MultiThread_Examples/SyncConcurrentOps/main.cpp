@@ -52,7 +52,10 @@ void processJobs() {
         // condition_variable::wait() check the condition
         // the condition is satisfied => return, still lock the mutex
         // the condition isn't satisfied => unlock the mutex and put the current thread in a blocked or waiting state
-        //
+        // During a call to wait(), the condition variable may check the supplied
+        // contidion any number of times.
+        // It always does so with the mutex locked and will return immediately if the
+        // function provided to test the condition return true
         uint32_t processJob{jobsQueue.front()};
         jobsQueue.pop();
         lock.unlock();
