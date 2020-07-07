@@ -13,6 +13,7 @@
 #include "hierarchical_mutex.h"
 #include "logictest/LogicThreadSafeStack.h"
 #include "logictest/logichierarchymutex.h"
+#include <gnu/libc-version.h>
 using std::lock_guard;
 using std::mutex;
 using std::vector;
@@ -68,5 +69,6 @@ int main() {
     uint64_t B{200000000};
     uint64_t C = A + B;
     cout << C << endl;
+    cout << "gnu c version: "<<gnu_get_libc_version() << endl;
     return 0;
 }
