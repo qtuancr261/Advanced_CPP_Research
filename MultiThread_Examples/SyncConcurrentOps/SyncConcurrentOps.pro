@@ -9,3 +9,6 @@ LIBS += \
         -lpthread \
         -ldl \
         -lrt
+
+HEADERS += \
+    ThreadSafeQueue.h

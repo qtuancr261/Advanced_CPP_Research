@@ -12,6 +12,7 @@
 #include <queue>
 #include <random>
 #include <thread>
+#include "ThreadSafeQueue.h"
 std::random_device randSeed;
 std::mutex mutexJobsQueue;
 
@@ -91,5 +92,6 @@ int main() {
         worker.join();
     }
 
+    ThreadSafeQueue<uint32_t> safeQueue;
     return 0;
 }
