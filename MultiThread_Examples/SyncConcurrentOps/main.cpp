@@ -93,5 +93,8 @@ int main() {
     }
 
     ThreadSafeQueue<uint32_t> safeQueue;
+    safeQueue.push(100);
+    safeQueue.push(10000);
+    std::cout << *safeQueue.tryAndPop();
     return 0;
 }
