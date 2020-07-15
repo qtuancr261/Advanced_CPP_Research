@@ -66,5 +66,11 @@ public:
         }
         return popValue;
     }
+
+    bool isEmpty() const {
+	std::lock_guard<std::mutex> lock{_mutex};
+	return _data.empty();
+    }
+
 };
 #endif  // THREADSAFEQUEUE_H
