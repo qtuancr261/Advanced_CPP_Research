@@ -28,7 +28,7 @@ template <typename T>
 class ThreadSafeStack {
 private:
     std::stack<T> _data;
-    std::mutex _dataMutex;
+    mutable std::mutex _dataMutex;
 
 public:
     ThreadSafeStack() = default;
