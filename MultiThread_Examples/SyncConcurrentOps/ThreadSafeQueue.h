@@ -68,9 +68,8 @@ public:
     }
 
     bool isEmpty() const {
-	std::lock_guard<std::mutex> lock{_mutex};
-	return _data.empty();
+        std::lock_guard<std::mutex> lock{_mutex};
+        return _data.empty();
     }
-
 };
 #endif  // THREADSAFEQUEUE_H
