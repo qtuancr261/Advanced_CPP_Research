@@ -27,40 +27,57 @@ void init(const std::string& path) {
 	close(fd);
 }
 int copyFile(const char* srcFile, const char* destFile) {
-    int inputFd{open(srcFile, O_RDONLY)};
-    if (inputFd < 0) {
-        std::cerr << "File " << srcFile << " not found " << std::endl;
-        return -1;
-    }
+	int inputFd{open(srcFile, O_RDONLY)};
+	if (inputFd < 0) {
+		std::cerr << "File " << srcFile << " not found " << std::endl;
+		return -1;
+	}
 
-    int outputFd{open(destFile, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR)};
-    if (outputFd < 0) {
-        std::cerr << "Couldn't create or write to " << destFile << "" << std::endl;
-        return -1;
-    }
+	int outputFd{open(destFile, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR)};
+	if (outputFd < 0) {
+		std::cerr << "Couldn't create or write to " << destFile << "" << std::endl;
+		return -1;
+	}
 
-    ssize_t nbytes;
-    char buf[BUF_SIZE]{};
-    while ((nbytes = read(inputFd, (void*)buf, BUF_SIZE)) > 0) {
-        if (write(outputFd, (void*)buf, nbytes) != nbytes) {
-            std::cerr << "Error when copy, exit " << std::endl;
-            return -2;
-        }
-    }
-    // end of input file
-    // last read must be 0
-    if (nbytes == -1) {
-        std::cerr << "Last read failed, exit " << std::endl;
-        return -2;
-    }
+	ssize_t nbytes;
+	char buf[BUF_SIZE]{};
+	while ((nbytes = read(inputFd, (void*)buf, BUF_SIZE)) > 0) {
+		if (write(outputFd, (void*)buf, nbytes) != nbytes) {
+			std::cerr << "Error when copy, exit " << std::endl;
+			return -2;
+		}
+	}
+	// end of input file
+	// last read must be 0
+	if (nbytes == -1) {
+		std::cerr << "Last read failed, exit " << std::endl;
+		return -2;
+	}
 
-    if (close(inputFd) == -1) return -3;
-    if (close(outputFd) == -1) return -3;
+	if (close(inputFd) == -1) return -3;
+	if (close(outputFd) == -1) return -3;
 
-    return 0;
+	return 0;
+}
+int lseekAndDoSt(const char* srcFile, const char* seekParam, const char* stParam) {
+	int fd{open(srcFile, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR)};
+	if (fd < 0) return -1;
+
+	off_t offset{atol(seekParam)};
+	// ok seek from start of the srcFile
+	if (lseek(fd, offset, SEEK_SET) == -1) return -2;
+	std::clog << "seed succeeded " << offset << std::endl;
 }
 int main(int argc, char* argv[]) {
-    for (int i = 0; i < argc; ++i) std::cout << argv[i] << std::endl;
-    copyFile(argv[1], argv[2]);
-    return 0;
+	for (int i = 0; i < argc; ++i) std::cout << argv[i] << std::endl;
+
+	std::string app{argv[1]};
+	if (app == "copy")
+		copyFile(argv[2], argv[3]);
+	else if (app == "lseekAccess")
+		lseekAndDoSt(argv[2], argv[3], argv[4]);
+	else {
+		std::clog << "copy <srcFile> <destFile>\n lseekAccess <srcFile> <seekOffset> <access> <nbytes> \n";
+	}
+	return 0;
 }
