@@ -13,8 +13,20 @@ using namespace std;
 static void BM_StringCreation(benchmark::State& state) {
     for (auto _ : state) std::string empty_string;
 }
+static void BM_StringLen100Creation(benchmark::State& state) {
+    for (auto _ : state) std::string len_sting(100, 'a');
+}
+static void BM_StringLen500Creation(benchmark::State& state) {
+    for (auto _ : state) std::string len_sting(500, 'a');
+}
+static void BM_StringLen1000Creation(benchmark::State& state) {
+    for (auto _ : state) std::string len_sting(1000, 'a');
+}
 // Register the function as a benchmark
 BENCHMARK(BM_StringCreation);
+BENCHMARK(BM_StringLen100Creation);
+BENCHMARK(BM_StringLen500Creation);
+BENCHMARK(BM_StringLen1000Creation);
 
 static void BM_StringCopy(benchmark::State& state) {
   std::string x = "hello";
