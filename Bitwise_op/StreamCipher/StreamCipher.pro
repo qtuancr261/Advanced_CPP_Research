@@ -4,10 +4,12 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+        XTEA.cpp \
         main.cpp
 
 HEADERS += \
-    FeedBackRegister.h
+    FeedBackRegister.h \
+    XTEA.h
 
 unix:!macx: LIBS += -L$$PWD/../../benchmark_lib/google_benchmark/lib/ -lbenchmark
 
