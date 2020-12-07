@@ -4,6 +4,7 @@
  *
  * Created on 8/9/2019
  */
+#include <gnu/libc-version.h>
 #include <algorithm>
 #include <iostream>
 #include <mutex>
@@ -13,7 +14,6 @@
 #include "hierarchical_mutex.h"
 #include "logictest/LogicThreadSafeStack.h"
 #include "logictest/logichierarchymutex.h"
-#include <gnu/libc-version.h>
 using std::lock_guard;
 using std::mutex;
 using std::vector;
@@ -42,7 +42,6 @@ thread_local uint32_t hierarchical_mutex::_thisThreadHierarchyValue{std::numeric
 
 int main() {
     cout << "Hello World!" << endl;
-
     // testStack.pop(popValue);
     LogicTestThreadSafeStack<int>::testPush(1, 300000);
     ThreadSafeStack<int> t1;
@@ -69,6 +68,6 @@ int main() {
     uint64_t B{200000000};
     uint64_t C = A + B;
     cout << C << endl;
-    cout << "gnu c version: "<<gnu_get_libc_version() << endl;
+    cout << "gnu c version: " << gnu_get_libc_version() << endl;
     return 0;
 }

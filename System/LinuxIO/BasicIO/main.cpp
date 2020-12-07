@@ -3,6 +3,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <cstring>
 #include <iostream>
 #include <string>
 #include "GenericStructures.h"
@@ -71,13 +72,20 @@ int lseekAndDoSt(const char* srcFile, const char* seekParam, const char* stParam
 int main(int argc, char* argv[]) {
 	for (int i = 0; i < argc; ++i) std::cout << argv[i] << std::endl;
 
-	std::string app{argv[1]};
-	if (app == "copy")
-		copyFile(argv[2], argv[3]);
-	else if (app == "lseekAccess")
-		lseekAndDoSt(argv[2], argv[3], argv[4]);
-	else {
-		std::clog << "copy <srcFile> <destFile>\n lseekAccess <srcFile> <seekOffset> <access> <nbytes> \n";
-	}
+	//	std::string app{argv[1]};
+	//	if (app == "copy")
+	//		copyFile(argv[2], argv[3]);
+	//	else if (app == "lseek_io")
+	//		lseekAndDoSt(argv[2], argv[3], argv[4]);
+	//	else {
+	//		std::clog << "copy <srcFile> <destFile>\n lseekAccess <srcFile> <seekOffset> <access> <nbytes> \n";
+	//	}
+
+	obj_t headerSrc{10, 20};
+	file_gen_t* fileT{new file_gen_t()};
+
+	std::string bufStr("tuantq3");
+	fileT->header = headerSrc;
+
 	return 0;
 }

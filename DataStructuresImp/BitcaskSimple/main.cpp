@@ -5,6 +5,8 @@
 using namespace std;
 std::string rootPath{"."};
 std::string logName{"idName"};
+class A {};
+
 int main() {
 	KVPairLog<int, int> _idNameLogs{rootPath, logName};
 	_idNameLogs.compactionLogSegment();

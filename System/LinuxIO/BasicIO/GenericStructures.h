@@ -14,4 +14,14 @@ struct generic_info_t {
 	uint64_t writeOffset;
 };
 
+struct obj_t {
+	uint64_t fileFD;
+	uint64_t objID;
+};
+
+struct file_gen_t {
+	obj_t header;
+	void* data;
+};
+
 #endif	// GENERICSTRUCTURES_H
