@@ -5,6 +5,7 @@
  * Created on 12/7/2020
  */
 #include <lz4.h>
+#include <snappy.h>
 #include <QDebug>
 #include <QFile>
 #include <QString>
@@ -86,20 +87,24 @@ static void BM_LZ4_decompress_safe(benchmark::State& state) {
 
 BENCHMARK(BM_LZ4_decompress_safe);
 
-BENCHMARK_MAIN();
-// int main() {
-//	example.clear();
-//	readMsgTemplate(example);
-//	cout << example.size() << endl;
-//	sizeCompressBound = LZ4_compressBound(example.size());
-//	cout << "Bound size: " << sizeCompressBound << endl;
-//	target.resize(sizeCompressBound);
-//	cout << target.size() << endl;
-//	sizeCompress = LZ4_compress_default(example.data(), target.data(), example.size(), target.size());
-//	target.resize(sizeCompress);
-//	cout << sizeCompress << endl;
-//	decompressTarget.resize(example.size());
-//	sizeDecompress = LZ4_decompress_safe(target.data(), decompressTarget.data(), target.size(), decompressTarget.size());
-//	cout << sizeDecompress << endl;
-//	return 0;
-//}
+// BENCHMARK_MAIN();
+int main() {
+    example.clear();
+    readMsgTemplate(example);
+    cout << example.size() << endl;
+    sizeCompressBound = LZ4_compressBound(example.size());
+    cout << "Bound size: " << sizeCompressBound << endl;
+    target.resize(sizeCompressBound);
+    cout << target.size() << endl;
+    sizeCompress = LZ4_compress_default(example.data(), target.data(), example.size(), target.size());
+    target.resize(sizeCompress);
+    cout << sizeCompress << endl;
+    decompressTarget.resize(example.size());
+    sizeDecompress = LZ4_decompress_safe(target.data(), decompressTarget.data(), target.size(), decompressTarget.size());
+    cout << sizeDecompress << endl;
+
+    cout << snappy::Compress(example.data(), example.size(), &target);
+    cout << snappy::Uncompress(target.data(), target.size(), &decompressTarget);
+    cout << decompressTarget.size();
+    return 0;
+}
