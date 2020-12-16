@@ -6,6 +6,8 @@
  */
 #include <lz4.h>
 #include <snappy.h>
+#include <zdict.h>
+#include <zstd.h>
 #include <QDebug>
 #include <QFile>
 #include <QString>
@@ -89,22 +91,36 @@ BENCHMARK(BM_LZ4_decompress_safe);
 
 // BENCHMARK_MAIN();
 int main() {
-    example.clear();
-    readMsgTemplate(example);
-    cout << example.size() << endl;
-    sizeCompressBound = LZ4_compressBound(example.size());
-    cout << "Bound size: " << sizeCompressBound << endl;
-    target.resize(sizeCompressBound);
-    cout << target.size() << endl;
-    sizeCompress = LZ4_compress_default(example.data(), target.data(), example.size(), target.size());
-    target.resize(sizeCompress);
-    cout << sizeCompress << endl;
-    decompressTarget.resize(example.size());
-    sizeDecompress = LZ4_decompress_safe(target.data(), decompressTarget.data(), target.size(), decompressTarget.size());
-    cout << sizeDecompress << endl;
+	example.clear();
+	cout << "LZ4" << endl;
+	readMsgTemplate(example);
+	cout << example.size() << endl;
+	sizeCompressBound = LZ4_compressBound(example.size());
+	cout << "Bound size: " << sizeCompressBound << endl;
+	target.resize(sizeCompressBound);
+	cout << target.size() << endl;
+	sizeCompress = LZ4_compress_default(example.data(), target.data(), example.size(), target.size());
+	target.resize(sizeCompress);
+	cout << sizeCompress << endl;
+	decompressTarget.resize(example.size());
+	sizeDecompress = LZ4_decompress_safe(target.data(), decompressTarget.data(), target.size(), decompressTarget.size());
+	cout << sizeDecompress << endl;
 
-    cout << snappy::Compress(example.data(), example.size(), &target);
-    cout << snappy::Uncompress(target.data(), target.size(), &decompressTarget);
-    cout << decompressTarget.size();
-    return 0;
+	cout << "Snappy " << SNAPPY_VERSION << endl;
+	cout << snappy::Compress(example.data(), example.size(), &target) << endl;
+	cout << snappy::Uncompress(target.data(), target.size(), &decompressTarget) << endl;
+	cout << decompressTarget.size() << endl;
+	assert(example == decompressTarget);
+
+	cout << "ZStd " << ZSTD_versionNumber() << endl;
+	sizeCompressBound = ZSTD_compressBound(example.size());
+	cout << "Bound size " << sizeCompressBound << endl;
+	target.resize(sizeCompressBound);
+	sizeCompress = ZSTD_compress((void*)target.data(), target.size(), (void*)example.data(), example.size(), 1);
+	cout << "Comp size " << sizeCompress << endl;
+	target.resize(sizeCompress);
+	sizeDecompress = ZSTD_decompress((void*)decompressTarget.data(), decompressTarget.size(), (void*)target.data(), target.size());
+	cout << "Decomp size " << sizeDecompress << endl;
+	assert(example == decompressTarget);
+	return 0;
 }

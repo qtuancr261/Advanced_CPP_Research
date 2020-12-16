@@ -23,3 +23,5 @@ PKGCONFIG += liblz4
 CONFIG += link_pkgconfig
 
 unix|win32: LIBS += -lsnappy
+
+unix|win32: LIBS += -lzstd
