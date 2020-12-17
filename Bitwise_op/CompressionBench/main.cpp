@@ -117,7 +117,7 @@ static void BM_zstd_compress(benchmark::State& state) {
 	sizeCompressBound = ZSTD_compressBound(example.size());
 	target.resize(sizeCompressBound);
 	for (auto _ : state) {
-		sizeCompress = ZSTD_compress((void*)target.data(), target.size(), (void*)example.data(), example.size(), 1);
+		sizeCompress = ZSTD_compress(target.data(), sizeCompressBound, example.data(), example.size(), 1);
 	}
 }
 
@@ -127,11 +127,44 @@ static void BM_zstd_decompress(benchmark::State& state) {
 	decompressTarget.clear();
 	decompressTarget.resize(ZSTD_getFrameContentSize(target.data(), target.size()));
 	for (auto _ : state) {
-		sizeDecompress = ZSTD_decompress((void*)decompressTarget.data(), decompressTarget.size(), (void*)target.data(), target.size());
+		sizeDecompress = ZSTD_decompress(decompressTarget.data(), decompressTarget.size(), target.data(), target.size());
 	}
 }
 
 BENCHMARK(BM_zstd_decompress);
+
+static void BM_zstd_compress_context(benchmark::State& state) {
+	// same compress ratio with zstd_compress
+	// optimize speed / resource
+	example.clear();
+	readMsgTemplate(example);
+	target.clear();
+	ZSTD_CCtx* comContext = ZSTD_createCCtx();
+	sizeCompressBound = ZSTD_compressBound(example.size());
+	target.resize(sizeCompressBound);
+	for (auto _ : state) {
+		// sizeCompress = ZSTD_compress((void*)target.data(), target.size(), (void*)example.data(), example.size(), 1);
+		sizeCompress = ZSTD_compressCCtx(comContext, target.data(), sizeCompressBound, example.data(), example.size(), 1);
+	}
+	ZSTD_freeCCtx(comContext);
+}
+
+BENCHMARK(BM_zstd_compress_context);
+
+static void BM_zstd_decompress_context(benchmark::State& state) {
+	// same decompress ratio with zstd_decompress
+	// optimize speed / resource
+	decompressTarget.clear();
+	decompressTarget.resize(ZSTD_getFrameContentSize(target.data(), target.size()));
+	ZSTD_DCtx* decomContext = ZSTD_createDCtx();
+	for (auto _ : state) {
+		// sizeDecompress = ZSTD_decompress(decompressTarget.data(), decompressTarget.size(), target.data(), target.size());
+		sizeDecompress = ZSTD_decompressDCtx(decomContext, decompressTarget.data(), decompressTarget.size(), target.data(), target.size());
+	}
+	ZSTD_freeDCtx(decomContext);
+}
+
+BENCHMARK(BM_zstd_decompress_context);
 
 BENCHMARK_MAIN();
 // int main() {
@@ -156,7 +189,7 @@ BENCHMARK_MAIN();
 //	cout << decompressTarget.size() << endl;
 //	assert(example == decompressTarget);
 
-//	cout << "ZStd " << ZSTD_versionNumber() << endl;
+//	cout << "ZSTD " << ZSTD_versionNumber() << endl;
 //	sizeCompressBound = ZSTD_compressBound(example.size());
 //	cout << "Bound size " << sizeCompressBound << endl;
 //	target.resize(sizeCompressBound);
@@ -167,5 +200,20 @@ BENCHMARK_MAIN();
 //	sizeDecompress = ZSTD_decompress((void*)decompressTarget.data(), decompressTarget.size(), (void*)target.data(), target.size());
 //	cout << "Decomp size " << sizeDecompress << endl;
 //	assert(example == decompressTarget);
+
+//	cout << "ZSTD use context " << ZSTD_versionNumber() << endl;
+//	ZSTD_CCtx* comCtx = ZSTD_createCCtx();
+//	sizeCompressBound = ZSTD_compressBound(example.size());
+//	cout << "Bound size " << sizeCompressBound << endl;
+//	target.resize(sizeCompressBound);
+//	sizeCompress = ZSTD_compressCCtx(comCtx, target.data(), target.size(), example.data(), example.size(), 1);
+//	cout << "Comp size " << sizeCompress << endl;
+//	cout << "decomp size " << ZSTD_getFrameContentSize(target.data(), target.size()) << endl;
+//	ZSTD_DCtx* decomCtx = ZSTD_createDCtx();
+//	target.resize(sizeCompress);
+//	sizeDecompress = ZSTD_decompressDCtx(decomCtx, decompressTarget.data(), sizeDecompress, target.data(), target.size());
+//	cout << "Decomp size " << sizeDecompress << endl;
+//	assert(example == decompressTarget);
+
 //	return 0;
 //}
