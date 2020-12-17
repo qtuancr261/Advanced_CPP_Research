@@ -5,6 +5,7 @@
  * Created on 12/7/2020
  */
 #include <lz4.h>
+#include <snappy-c.h>
 #include <snappy.h>
 #include <zdict.h>
 #include <zstd.h>
@@ -89,38 +90,82 @@ static void BM_LZ4_decompress_safe(benchmark::State& state) {
 
 BENCHMARK(BM_LZ4_decompress_safe);
 
-// BENCHMARK_MAIN();
-int main() {
+static void BM_snappy_compress(benchmark::State& state) {
 	example.clear();
-	cout << "LZ4" << endl;
 	readMsgTemplate(example);
-	cout << example.size() << endl;
-	sizeCompressBound = LZ4_compressBound(example.size());
-	cout << "Bound size: " << sizeCompressBound << endl;
-	target.resize(sizeCompressBound);
-	cout << target.size() << endl;
-	sizeCompress = LZ4_compress_default(example.data(), target.data(), example.size(), target.size());
-	target.resize(sizeCompress);
-	cout << sizeCompress << endl;
-	decompressTarget.resize(example.size());
-	sizeDecompress = LZ4_decompress_safe(target.data(), decompressTarget.data(), target.size(), decompressTarget.size());
-	cout << sizeDecompress << endl;
-
-	cout << "Snappy " << SNAPPY_VERSION << endl;
-	cout << snappy::Compress(example.data(), example.size(), &target) << endl;
-	cout << snappy::Uncompress(target.data(), target.size(), &decompressTarget) << endl;
-	cout << decompressTarget.size() << endl;
-	assert(example == decompressTarget);
-
-	cout << "ZStd " << ZSTD_versionNumber() << endl;
-	sizeCompressBound = ZSTD_compressBound(example.size());
-	cout << "Bound size " << sizeCompressBound << endl;
-	target.resize(sizeCompressBound);
-	sizeCompress = ZSTD_compress((void*)target.data(), target.size(), (void*)example.data(), example.size(), 1);
-	cout << "Comp size " << sizeCompress << endl;
-	target.resize(sizeCompress);
-	sizeDecompress = ZSTD_decompress((void*)decompressTarget.data(), decompressTarget.size(), (void*)target.data(), target.size());
-	cout << "Decomp size " << sizeDecompress << endl;
-	assert(example == decompressTarget);
-	return 0;
+	target.clear();
+	for (auto _ : state) {
+		sizeCompress = snappy::Compress(example.data(), example.size(), &target);
+	}
 }
+
+BENCHMARK(BM_snappy_compress);
+
+static void BM_snappy_decompress(benchmark::State& state) {
+	decompressTarget.clear();
+	for (auto _ : state) {
+		sizeDecompress = snappy::Uncompress(target.data(), target.size(), &decompressTarget);
+	}
+}
+
+BENCHMARK(BM_snappy_decompress);
+
+static void BM_zstd_compress(benchmark::State& state) {
+	example.clear();
+	readMsgTemplate(example);
+	target.clear();
+	sizeCompressBound = ZSTD_compressBound(example.size());
+	target.resize(sizeCompressBound);
+	for (auto _ : state) {
+		sizeCompress = ZSTD_compress((void*)target.data(), target.size(), (void*)example.data(), example.size(), 1);
+	}
+}
+
+BENCHMARK(BM_zstd_compress);
+
+static void BM_zstd_decompress(benchmark::State& state) {
+	decompressTarget.clear();
+	decompressTarget.resize(ZSTD_getFrameContentSize(target.data(), target.size()));
+	for (auto _ : state) {
+		sizeDecompress = ZSTD_decompress((void*)decompressTarget.data(), decompressTarget.size(), (void*)target.data(), target.size());
+	}
+}
+
+BENCHMARK(BM_zstd_decompress);
+
+BENCHMARK_MAIN();
+// int main() {
+//	example.clear();
+//	cout << "LZ4" << endl;
+//	readMsgTemplate(example);
+//	cout << example.size() << endl;
+//	sizeCompressBound = LZ4_compressBound(example.size());
+//	cout << "Bound size: " << sizeCompressBound << endl;
+//	target.resize(sizeCompressBound);
+//	cout << target.size() << endl;
+//	sizeCompress = LZ4_compress_default(example.data(), target.data(), example.size(), target.size());
+//	target.resize(sizeCompress);
+//	cout << sizeCompress << endl;
+//	decompressTarget.resize(example.size());
+//	sizeDecompress = LZ4_decompress_safe(target.data(), decompressTarget.data(), target.size(), decompressTarget.size());
+//	cout << sizeDecompress << endl;
+
+//	cout << "Snappy " << SNAPPY_VERSION << endl;
+//	cout << snappy::Compress(example.data(), example.size(), &target) << endl;
+//	cout << snappy::Uncompress(target.data(), target.size(), &decompressTarget) << endl;
+//	cout << decompressTarget.size() << endl;
+//	assert(example == decompressTarget);
+
+//	cout << "ZStd " << ZSTD_versionNumber() << endl;
+//	sizeCompressBound = ZSTD_compressBound(example.size());
+//	cout << "Bound size " << sizeCompressBound << endl;
+//	target.resize(sizeCompressBound);
+//	sizeCompress = ZSTD_compress((void*)target.data(), target.size(), (void*)example.data(), example.size(), 1);
+//	cout << "Comp size " << sizeCompress << endl;
+//	cout << "decomp size " << ZSTD_getFrameContentSize(target.data(), target.size()) << endl;
+//	target.resize(sizeCompress);
+//	sizeDecompress = ZSTD_decompress((void*)decompressTarget.data(), decompressTarget.size(), (void*)target.data(), target.size());
+//	cout << "Decomp size " << sizeDecompress << endl;
+//	assert(example == decompressTarget);
+//	return 0;
+//}
