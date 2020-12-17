@@ -51,10 +51,9 @@ static void BM_StringCopy(benchmark::State& state) {
 	std::string x = "hello";
 	for (auto _ : state) std::string copy(x);
 }
-BENCHMARK(BM_StringCopy);
+// BENCHMARK(BM_StringCopy);
 
 // memcpy as default ratio
-static void BM_memcpy(benchmark::State& state) {}
 
 // Begin benchmark
 // BENCHMARK_MAIN();
@@ -65,6 +64,18 @@ int sizeCompress{};
 int sizeDecompress{};
 int sizeCompressBound{};
 
+static void BM_memcpy(benchmark::State& state) {
+	example.clear();
+	readMsgTemplate(example);
+	target.resize(example.size());
+	for (auto _ : state) {
+		memcpy(target.data(), example.data(), example.size());
+	}
+	state.SetBytesProcessed((int64_t)state.iterations() * example.size());
+}
+
+BENCHMARK(BM_memcpy);
+
 static void BM_LZ4_compress_default(benchmark::State& state) {
 	example.clear();
 	readMsgTemplate(example);
@@ -73,6 +84,7 @@ static void BM_LZ4_compress_default(benchmark::State& state) {
 	for (auto _ : state) {
 		sizeCompress = LZ4_compress_default(example.data(), target.data(), example.size(), target.size());
 	}
+	state.SetBytesProcessed((int64_t)state.iterations() * example.size());
 }
 
 BENCHMARK(BM_LZ4_compress_default);
@@ -85,6 +97,7 @@ static void BM_LZ4_decompress_safe(benchmark::State& state) {
 	for (auto _ : state) {
 		sizeDecompress = LZ4_decompress_safe(target.data(), decompressTarget.data(), target.size(), decompressTarget.size());
 	}
+	state.SetBytesProcessed((int64_t)state.iterations() * example.size());
 	// cout << "Size decomp " << sizeDecompress << endl;
 }
 
@@ -97,6 +110,7 @@ static void BM_snappy_compress(benchmark::State& state) {
 	for (auto _ : state) {
 		sizeCompress = snappy::Compress(example.data(), example.size(), &target);
 	}
+	state.SetBytesProcessed((int64_t)state.iterations() * example.size());
 }
 
 BENCHMARK(BM_snappy_compress);
@@ -106,6 +120,7 @@ static void BM_snappy_decompress(benchmark::State& state) {
 	for (auto _ : state) {
 		sizeDecompress = snappy::Uncompress(target.data(), target.size(), &decompressTarget);
 	}
+	state.SetBytesProcessed((int64_t)state.iterations() * example.size());
 }
 
 BENCHMARK(BM_snappy_decompress);
@@ -119,6 +134,7 @@ static void BM_zstd_compress(benchmark::State& state) {
 	for (auto _ : state) {
 		sizeCompress = ZSTD_compress(target.data(), sizeCompressBound, example.data(), example.size(), 1);
 	}
+	state.SetBytesProcessed((int64_t)state.iterations() * example.size());
 }
 
 BENCHMARK(BM_zstd_compress);
@@ -129,6 +145,7 @@ static void BM_zstd_decompress(benchmark::State& state) {
 	for (auto _ : state) {
 		sizeDecompress = ZSTD_decompress(decompressTarget.data(), decompressTarget.size(), target.data(), target.size());
 	}
+	state.SetBytesProcessed((int64_t)state.iterations() * example.size());
 }
 
 BENCHMARK(BM_zstd_decompress);
@@ -146,6 +163,7 @@ static void BM_zstd_compress_context(benchmark::State& state) {
 		// sizeCompress = ZSTD_compress((void*)target.data(), target.size(), (void*)example.data(), example.size(), 1);
 		sizeCompress = ZSTD_compressCCtx(comContext, target.data(), sizeCompressBound, example.data(), example.size(), 1);
 	}
+	state.SetBytesProcessed((int64_t)state.iterations() * example.size());
 	ZSTD_freeCCtx(comContext);
 }
 
@@ -161,6 +179,7 @@ static void BM_zstd_decompress_context(benchmark::State& state) {
 		// sizeDecompress = ZSTD_decompress(decompressTarget.data(), decompressTarget.size(), target.data(), target.size());
 		sizeDecompress = ZSTD_decompressDCtx(decomContext, decompressTarget.data(), decompressTarget.size(), target.data(), target.size());
 	}
+	state.SetBytesProcessed((int64_t)state.iterations() * example.size());
 	ZSTD_freeDCtx(decomContext);
 }
 
