@@ -15,6 +15,7 @@
 #include <QTextStream>
 #include <cstring>
 #include <iostream>
+#include <memory>
 #include <random>
 #include <string>
 #include "google_benchmark/inc/benchmark.h"
@@ -63,6 +64,10 @@ std::string decompressTarget(1000, 'b');
 int sizeCompress{};
 int sizeDecompress{};
 int sizeCompressBound{};
+size_t sizeCBound{};
+size_t sizeDBound{};
+std::unique_ptr<char[]> targetData{nullptr};
+std::unique_ptr<char[]> decompressData{nullptr};
 
 static void BM_memcpy(benchmark::State& state) {
 	example.clear();
@@ -124,6 +129,40 @@ static void BM_snappy_decompress(benchmark::State& state) {
 }
 
 BENCHMARK(BM_snappy_decompress);
+
+static void BM_snappy_c_compress(benchmark::State& state) {
+	example.clear();
+	readMsgTemplate(example);
+	sizeCompressBound = snappy_max_compressed_length(example.size());
+	// char* targetData{new char[sizeCompressBound]};
+	targetData.reset(new char[sizeCompressBound]);
+	for (auto _ : state) {
+		sizeCBound = sizeCompressBound;
+		if (snappy_compress(example.data(), example.size(), targetData.get(), &sizeCBound) != SNAPPY_OK) state.SetBytesProcessed(0);
+	}
+	state.SetBytesProcessed((int64_t)state.iterations() * example.size());
+}
+
+BENCHMARK(BM_snappy_c_compress);
+
+static void BM_snappy_c_decompress(benchmark::State& state) {
+	if (snappy_uncompressed_length(targetData.get(), sizeCBound, &sizeDBound) != SNAPPY_OK) {
+		state.SetBytesProcessed(0);
+		return;
+	}
+	sizeDecompress = sizeDBound;
+	// char* decomData{new char[sizeDBound]};
+	decompressData.reset(new char[sizeDBound]);
+	for (auto _ : state) {
+		if (snappy_uncompress(targetData.get(), sizeCBound, decompressData.get(), &sizeDBound) != SNAPPY_OK) {
+			state.SetBytesProcessed(0);
+		}
+		sizeDBound = sizeDecompress;
+	}
+	state.SetBytesProcessed((int64_t)state.iterations() * example.size());
+}
+
+BENCHMARK(BM_snappy_c_decompress);
 
 static void BM_zstd_compress(benchmark::State& state) {
 	example.clear();
@@ -207,6 +246,19 @@ BENCHMARK_MAIN();
 //	cout << snappy::Uncompress(target.data(), target.size(), &decompressTarget) << endl;
 //	cout << decompressTarget.size() << endl;
 //	assert(example == decompressTarget);
+
+//	example.clear();
+//	cout << "Snappy_C " << SNAPPY_VERSION << endl;
+//	readMsgTemplate(example);
+//	sizeCBound = snappy_max_compressed_length(example.size());
+//	cout << sizeCBound << endl;
+//	char* targetData{new char[sizeCBound]};
+//	if (snappy_compress(example.data(), example.size(), targetData, &sizeCBound) != SNAPPY_OK) {
+//		cout << "snappy_c compress failed: buffer too small " << example.size() << " : " << sizeCBound << endl;
+//	} else {
+//		cout << "snappy_c compress success " << example.size() << " : " << sizeCBound << endl;
+//	}
+//	delete[] targetData;
 
 //	cout << "ZSTD " << ZSTD_versionNumber() << endl;
 //	sizeCompressBound = ZSTD_compressBound(example.size());
