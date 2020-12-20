@@ -4,10 +4,12 @@ CONFIG += console c++17
 CONFIG -= app_bundle
 
 SOURCES += \
+        TemplatePCMsg.cpp \
         main.cpp
 
 HEADERS += \
     FeedBackRegister.h \
+    TemplatePCMsg.h
 
 unix:!macx: LIBS += -L$$PWD/../../benchmark_lib/google_benchmark/lib/ -lbenchmark
 
