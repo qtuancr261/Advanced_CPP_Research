@@ -19,8 +19,14 @@
 #include <random>
 #include <string>
 #include "google_benchmark/inc/benchmark.h"
+
+// ZSTD tips: In general, a reasonable dictionary has a size of ~ 100 KB
+#define ZSTD_DICT_DEF_SIZE 100000
+
 using namespace std;
 std::default_random_engine randEngine;
+
+QString platform[]{"linux", "win", "ios", "android"};
 void zenString(std::string& result, size_t len, bool isPrintable) {
 	int min = isPrintable ? 32 : 0;
 	int max = isPrintable ? 126 : 255;
@@ -32,21 +38,40 @@ void zenString(std::string& result, size_t len, bool isPrintable) {
 }
 
 void readMsgPattern(std::string& msgPattern) {
-    QFile msgPatternFile("zns_msgp_pattern.html");
-    QString pattern;
-    QString line("");
-    if (msgPatternFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream readStream(&msgPatternFile);
-        while (readStream.readLineInto(&line)) {
-            pattern.append(line);
-            line.clear();
-        }
-    }
-    QString genMsg = pattern.arg("500 USD").arg(2611996).arg(20202231).arg("linux");
-    msgPattern = genMsg.toStdString();
-    std::cout << msgPattern;
-    // qDebug() << genMsg;
+	qDebug() << "read pattern";
+	QFile msgPatternFile("zns_msgp_pattern.html");
+	QString pattern;
+	QString line("");
+	if (msgPatternFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		QTextStream readStream(&msgPatternFile);
+		while (readStream.readLineInto(&line)) {
+			pattern.append(line);
+			line.clear();
+		}
+	}
+	// 1: cash
+	// 2: id
+	// 3: img id
+	// 4: platform
+	// QString genMsg = pattern.arg(500).arg(2611996).arg(20202231).arg("linux");
+	msgPattern = pattern.toStdString();
+	// std::cout << msgPattern;
+	// qDebug() << genMsg;
 }
+
+void genMsgFromPattern(std::string& samples, size_t* samplesSizes, const std::string& pattern, size_t numMsg) {
+	qDebug() << "gen msg from pattern";
+	uniform_int_distribution<uint32_t> dis;
+	QString patternQ{QString::fromStdString(pattern)};
+
+	for (size_t i{}; i < numMsg; ++i) {
+		QString genMsg = patternQ.arg(dis(randEngine)).arg(numMsg).arg(dis(randEngine)).arg(platform[i & 3]);
+		std::string tmpStr = genMsg.toStdString();
+		samplesSizes[i] = tmpStr.size();
+		samples.append(tmpStr);
+	}
+}
+
 void readMsgTemplate(std::string& msg) {
 	QFile msgTempFile("zns_msgp.245111.html");
 	if (msgTempFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -243,65 +268,121 @@ BENCHMARK(BM_zstd_decompress_context);
 
 // BENCHMARK_MAIN();
 int main() {
-    //	example.clear();
-    //	cout << "LZ4" << endl;
-    //	readMsgTemplate(example);
-    //	cout << example.size() << endl;
-    //	sizeCompressBound = LZ4_compressBound(example.size());
-    //	cout << "Bound size: " << sizeCompressBound << endl;
-    //	target.resize(sizeCompressBound);
-    //	cout << target.size() << endl;
-    //	sizeCompress = LZ4_compress_default(example.data(), target.data(), example.size(), target.size());
-    //	target.resize(sizeCompress);
-    //	cout << sizeCompress << endl;
-    //	decompressTarget.resize(example.size());
-    //	sizeDecompress = LZ4_decompress_safe(target.data(), decompressTarget.data(), target.size(), decompressTarget.size());
-    //	cout << sizeDecompress << endl;
+	//	example.clear();
+	//	cout << "LZ4" << endl;
+	//	readMsgTemplate(example);
+	//	cout << example.size() << endl;
+	//	sizeCompressBound = LZ4_compressBound(example.size());
+	//	cout << "Bound size: " << sizeCompressBound << endl;
+	//	target.resize(sizeCompressBound);
+	//	cout << target.size() << endl;
+	//	sizeCompress = LZ4_compress_default(example.data(), target.data(), example.size(), target.size());
+	//	target.resize(sizeCompress);
+	//	cout << sizeCompress << endl;
+	//	decompressTarget.resize(example.size());
+	//	sizeDecompress = LZ4_decompress_safe(target.data(), decompressTarget.data(), target.size(), decompressTarget.size());
+	//	cout << sizeDecompress << endl;
 
-    //	cout << "Snappy " << SNAPPY_VERSION << endl;
-    //	cout << snappy::Compress(example.data(), example.size(), &target) << endl;
-    //	cout << snappy::Uncompress(target.data(), target.size(), &decompressTarget) << endl;
-    //	cout << decompressTarget.size() << endl;
-    //	assert(example == decompressTarget);
+	//	cout << "Snappy " << SNAPPY_VERSION << endl;
+	//	cout << snappy::Compress(example.data(), example.size(), &target) << endl;
+	//	cout << snappy::Uncompress(target.data(), target.size(), &decompressTarget) << endl;
+	//	cout << decompressTarget.size() << endl;
+	//	assert(example == decompressTarget);
 
-    //	example.clear();
-    //	cout << "Snappy_C " << SNAPPY_VERSION << endl;
-    //	readMsgTemplate(example);
-    //	sizeCBound = snappy_max_compressed_length(example.size());
-    //	cout << sizeCBound << endl;
-    //	char* targetData{new char[sizeCBound]};
-    //	if (snappy_compress(example.data(), example.size(), targetData, &sizeCBound) != SNAPPY_OK) {
-    //		cout << "snappy_c compress failed: buffer too small " << example.size() << " : " << sizeCBound << endl;
-    //	} else {
-    //		cout << "snappy_c compress success " << example.size() << " : " << sizeCBound << endl;
-    //	}
-    //	delete[] targetData;
+	//	example.clear();
+	//	cout << "Snappy_C " << SNAPPY_VERSION << endl;
+	//	readMsgTemplate(example);
+	//	sizeCBound = snappy_max_compressed_length(example.size());
+	//	cout << sizeCBound << endl;
+	//	char* targetData{new char[sizeCBound]};
+	//	if (snappy_compress(example.data(), example.size(), targetData, &sizeCBound) != SNAPPY_OK) {
+	//		cout << "snappy_c compress failed: buffer too small " << example.size() << " : " << sizeCBound << endl;
+	//	} else {
+	//		cout << "snappy_c compress success " << example.size() << " : " << sizeCBound << endl;
+	//	}
+	//	delete[] targetData;
 
-    //	cout << "ZSTD " << ZSTD_versionNumber() << endl;
-    //	sizeCompressBound = ZSTD_compressBound(example.size());
-    //	cout << "Bound size " << sizeCompressBound << endl;
-    //	target.resize(sizeCompressBound);
-    //	sizeCompress = ZSTD_compress((void*)target.data(), target.size(), (void*)example.data(), example.size(), 1);
-    //	cout << "Comp size " << sizeCompress << endl;
-    //	cout << "decomp size " << ZSTD_getFrameContentSize(target.data(), target.size()) << endl;
-    //	target.resize(sizeCompress);
-    //	sizeDecompress = ZSTD_decompress((void*)decompressTarget.data(), decompressTarget.size(), (void*)target.data(), target.size());
-    //	cout << "Decomp size " << sizeDecompress << endl;
-    //	assert(example == decompressTarget);
+	//	cout << "ZSTD " << ZSTD_versionNumber() << endl;
+	//	sizeCompressBound = ZSTD_compressBound(example.size());
+	//	cout << "Bound size " << sizeCompressBound << endl;
+	//	target.resize(sizeCompressBound);
+	//	sizeCompress = ZSTD_compress((void*)target.data(), target.size(), (void*)example.data(), example.size(), 1);
+	//	cout << "Comp size " << sizeCompress << endl;
+	//	cout << "decomp size " << ZSTD_getFrameContentSize(target.data(), target.size()) << endl;
+	//	target.resize(sizeCompress);
+	//	sizeDecompress = ZSTD_decompress((void*)decompressTarget.data(), decompressTarget.size(), (void*)target.data(), target.size());
+	//	cout << "Decomp size " << sizeDecompress << endl;
+	//	assert(example == decompressTarget);
 
-    //	cout << "ZSTD use context " << ZSTD_versionNumber() << endl;
-    //	ZSTD_CCtx* comCtx = ZSTD_createCCtx();
-    //	sizeCompressBound = ZSTD_compressBound(example.size());
-    //	cout << "Bound size " << sizeCompressBound << endl;
-    //	target.resize(sizeCompressBound);
-    //	sizeCompress = ZSTD_compressCCtx(comCtx, target.data(), target.size(), example.data(), example.size(), 1);
-    //	cout << "Comp size " << sizeCompress << endl;
-    //	cout << "decomp size " << ZSTD_getFrameContentSize(target.data(), target.size()) << endl;
-    //	ZSTD_DCtx* decomCtx = ZSTD_createDCtx();
-    //	target.resize(sizeCompress);
-    //	sizeDecompress = ZSTD_decompressDCtx(decomCtx, decompressTarget.data(), sizeDecompress, target.data(), target.size());
-    //	cout << "Decomp size " << sizeDecompress << endl;
-    //	assert(example == decompressTarget);
-    readMsgPattern(example);
-    return 0;
+	//	cout << "ZSTD use context " << ZSTD_versionNumber() << endl;
+	//	ZSTD_CCtx* comCtx = ZSTD_createCCtx();
+	//	sizeCompressBound = ZSTD_compressBound(example.size());
+	//	cout << "Bound size " << sizeCompressBound << endl;
+	//	target.resize(sizeCompressBound);
+	//	sizeCompress = ZSTD_compressCCtx(comCtx, target.data(), target.size(), example.data(), example.size(), 1);
+	//	cout << "Comp size " << sizeCompress << endl;
+	//	cout << "decomp size " << ZSTD_getFrameContentSize(target.data(), target.size()) << endl;
+	//	ZSTD_DCtx* decomCtx = ZSTD_createDCtx();
+	//	target.resize(sizeCompress);
+	//	sizeDecompress = ZSTD_decompressDCtx(decomCtx, decompressTarget.data(), sizeDecompress, target.data(), target.size());
+	//	cout << "Decomp size " << sizeDecompress << endl;
+	//	assert(example == decompressTarget);
+	std::string pattern;
+	readMsgPattern(pattern);
+
+	void* dictBuffer{malloc(ZSTD_DICT_DEF_SIZE)};
+	size_t* samplesSizes{new size_t[3000]};
+	std::string samples;
+	if (dictBuffer) {
+		// a few thousands samples
+		genMsgFromPattern(samples, samplesSizes, pattern, 3000);
+		// build dict
+		size_t dictTrainedSize = ZDICT_trainFromBuffer(dictBuffer, ZSTD_DICT_DEF_SIZE, samples.data(), samplesSizes, 3000);
+		if (ZDICT_isError(dictTrainedSize)) {
+			qDebug() << "Train dict failed: " << dictTrainedSize;
+		} else {
+			qDebug() << "Train dict completed: " << dictTrainedSize;
+			// ok, let's pick some samples and compress - decompress using dict
+			qDebug() << "template size " << pattern.size();
+			ZSTD_CDict* cdict = ZSTD_createCDict(dictBuffer, dictTrainedSize, 1);
+			ZSTD_DDict* ddict = ZSTD_createDDict(dictBuffer, dictTrainedSize);
+			if (cdict == NULL) {
+				qDebug() << "ZSTD_creatCDict from trained dict buff is failed ";
+			} else {
+				ZSTD_CCtx* comCtx = ZSTD_createCCtx();
+				ZSTD_DCtx* decomCtx = ZSTD_createDCtx();
+				std::string targetCompress;
+				std::string targetDecompress;
+				char* data = samples.data();
+				for (int i{}; i < 20; ++i) {
+					// compress
+					targetCompress.clear();
+					sizeCompressBound = ZSTD_compressBound(samplesSizes[i]);
+					targetCompress.resize(sizeCompressBound);
+
+					sizeCompress = ZSTD_compress_usingCDict(comCtx, targetCompress.data(), sizeCompressBound, data, samplesSizes[i], cdict);
+					// decompress
+					// targetDecompress.clear();
+					// targetDecompress.resize(ZSTD_getFrameContentSize(targetCompress.data(), targetCompress.size()));
+					// sizeDecompress = ZSTD_decompress_usingDDict(
+					//	decomCtx, targetDecompress.data(), targetDecompress.size(), targetCompress.data(), targetCompress.size(), ddict);
+
+					qDebug() << samplesSizes[i] << " -> " << sizeCompress << " -> " << sizeDecompress;
+					//----------------------
+					data += samplesSizes[i];
+				}
+				ZSTD_freeCCtx(comCtx);
+				ZSTD_freeDCtx(decomCtx);
+			}
+			ZSTD_freeCDict(cdict);
+			ZSTD_freeDDict(ddict);
+		}
+
+	} else {
+		qDebug() << "alloct dictBuffer failed ";
+	}
+
+	free(dictBuffer);
+	delete[] samplesSizes;
+	return 0;
 }
