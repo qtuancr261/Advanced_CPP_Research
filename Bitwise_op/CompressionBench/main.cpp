@@ -215,6 +215,7 @@ static void BM_zstd_compress(benchmark::State& state) {
 	for (auto _ : state) {
 		sizeCompress = ZSTD_compress(target.data(), sizeCompressBound, example.data(), example.size(), 1);
 	}
+	target.resize(sizeCompress);
 	state.SetBytesProcessed((int64_t)state.iterations() * example.size());
 }
 
@@ -225,6 +226,10 @@ static void BM_zstd_decompress(benchmark::State& state) {
 	decompressTarget.resize(ZSTD_getFrameContentSize(target.data(), target.size()));
 	for (auto _ : state) {
 		sizeDecompress = ZSTD_decompress(decompressTarget.data(), decompressTarget.size(), target.data(), target.size());
+		if (ZSTD_isError(sizeDecompress)) {
+			qDebug() << ZSTD_getErrorName(sizeDecompress);
+			return;
+		}
 	}
 	state.SetBytesProcessed((int64_t)state.iterations() * example.size());
 }
@@ -244,6 +249,7 @@ static void BM_zstd_compress_context(benchmark::State& state) {
 		// sizeCompress = ZSTD_compress((void*)target.data(), target.size(), (void*)example.data(), example.size(), 1);
 		sizeCompress = ZSTD_compressCCtx(comContext, target.data(), sizeCompressBound, example.data(), example.size(), 1);
 	}
+	target.resize(sizeCompress);
 	state.SetBytesProcessed((int64_t)state.iterations() * example.size());
 	ZSTD_freeCCtx(comContext);
 }
@@ -259,6 +265,10 @@ static void BM_zstd_decompress_context(benchmark::State& state) {
 	for (auto _ : state) {
 		// sizeDecompress = ZSTD_decompress(decompressTarget.data(), decompressTarget.size(), target.data(), target.size());
 		sizeDecompress = ZSTD_decompressDCtx(decomContext, decompressTarget.data(), decompressTarget.size(), target.data(), target.size());
+		if (ZSTD_isError(sizeDecompress)) {
+			qDebug() << ZSTD_getErrorName(sizeDecompress);
+			return;
+		}
 	}
 	state.SetBytesProcessed((int64_t)state.iterations() * example.size());
 	ZSTD_freeDCtx(decomContext);
@@ -327,6 +337,8 @@ int main() {
 	//	sizeDecompress = ZSTD_decompressDCtx(decomCtx, decompressTarget.data(), sizeDecompress, target.data(), target.size());
 	//	cout << "Decomp size " << sizeDecompress << endl;
 	//	assert(example == decompressTarget);
+
+	// ZSTD use dict
 	std::string pattern;
 	readMsgPattern(pattern);
 
@@ -346,8 +358,8 @@ int main() {
 			qDebug() << "template size " << pattern.size();
 			ZSTD_CDict* cdict = ZSTD_createCDict(dictBuffer, dictTrainedSize, 1);
 			ZSTD_DDict* ddict = ZSTD_createDDict(dictBuffer, dictTrainedSize);
-			if (cdict == NULL) {
-				qDebug() << "ZSTD_creatCDict from trained dict buff is failed ";
+			if (cdict == NULL || ddict == NULL) {
+				qDebug() << "ZSTD_createCDict | ZSTD_createDDict from trained dict buff is failed ";
 			} else {
 				ZSTD_CCtx* comCtx = ZSTD_createCCtx();
 				ZSTD_DCtx* decomCtx = ZSTD_createDCtx();
@@ -361,13 +373,24 @@ int main() {
 					targetCompress.resize(sizeCompressBound);
 
 					sizeCompress = ZSTD_compress_usingCDict(comCtx, targetCompress.data(), sizeCompressBound, data, samplesSizes[i], cdict);
+					// must do
+					targetCompress.resize(sizeCompress);
 					// decompress
-					// targetDecompress.clear();
-					// targetDecompress.resize(ZSTD_getFrameContentSize(targetCompress.data(), targetCompress.size()));
-					// sizeDecompress = ZSTD_decompress_usingDDict(
-					//	decomCtx, targetDecompress.data(), targetDecompress.size(), targetCompress.data(), targetCompress.size(), ddict);
-
+					targetDecompress.clear();
+					targetDecompress.resize(ZSTD_getFrameContentSize(targetCompress.data(), targetCompress.size()));
+					auto expectedDictID = ZSTD_getDictID_fromDDict(ddict);
+					auto actualDictID = ZSTD_getDictID_fromFrame(targetCompress.data(), targetCompress.size());
+					if (expectedDictID != actualDictID) {
+						qDebug() << "Mismatch dictID";
+					}
+					sizeDecompress = ZSTD_decompress_usingDDict(
+						decomCtx, targetDecompress.data(), targetDecompress.size(), targetCompress.data(), targetCompress.size(), ddict);
+					if (ZSTD_isError(sizeDecompress)) {
+						qDebug() << ZSTD_getErrorName(sizeDecompress);
+					}
+					assert(samplesSizes[i] == sizeDecompress);
 					qDebug() << samplesSizes[i] << " -> " << sizeCompress << " -> " << sizeDecompress;
+
 					//----------------------
 					data += samplesSizes[i];
 				}
