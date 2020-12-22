@@ -27,6 +27,7 @@ using namespace std;
 std::default_random_engine randEngine;
 
 QString platform[]{"linux", "win", "ios", "android"};
+QString platformTest[]{"ios-11", "ios-12", "android-5", "android-6", "android-7", "linux", "IoT"};
 void zenString(std::string& result, size_t len, bool isPrintable) {
 	int min = isPrintable ? 32 : 0;
 	int max = isPrintable ? 126 : 255;
@@ -72,6 +73,22 @@ void genMsgFromPattern(std::string& samples, size_t* samplesSizes, const std::st
 	}
 }
 
+void genMsgTestFromPattern(std::vector<string>& samples, const std::string& pattern, size_t numMsg) {
+    qDebug() << "gen " << numMsg << "msg test from pattern";
+    samples.reserve(numMsg);
+
+    uniform_int_distribution<uint64_t> dis;
+    QString patternQ{QString::fromStdString(pattern)};
+
+    for (size_t i{}; i < numMsg; ++i) {
+        QString genMsg = patternQ.arg(dis(randEngine)).arg(numMsg).arg(dis(randEngine)).arg(platformTest[i & 6]);
+        std::string tmpStr = genMsg.toStdString();
+        samples.push_back(tmpStr);
+        //		samplesSizes[i] = tmpStr.size();
+        //		samples.append(tmpStr);
+    }
+}
+
 void readMsgTemplate(std::string& msg) {
 	QFile msgTempFile("zns_msgp.245111.html");
 	if (msgTempFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -84,7 +101,7 @@ void readMsgTemplate(std::string& msg) {
 	}
 }
 static void BM_StringCreation(benchmark::State& state) {
-	for (auto _ : state) std::string empty_string;
+    for (auto _ : state) std::string empty_string;
 }
 
 // Register the function as a benchmark
@@ -345,6 +362,7 @@ int main() {
 	void* dictBuffer{malloc(ZSTD_DICT_DEF_SIZE)};
 	size_t* samplesSizes{new size_t[3000]};
 	std::string samples;
+    std::vector<string> samplesTest;
 	if (dictBuffer) {
 		// a few thousands samples
 		genMsgFromPattern(samples, samplesSizes, pattern, 3000);
@@ -363,16 +381,17 @@ int main() {
 			} else {
 				ZSTD_CCtx* comCtx = ZSTD_createCCtx();
 				ZSTD_DCtx* decomCtx = ZSTD_createDCtx();
+                genMsgTestFromPattern(samplesTest, pattern, 5000);
 				std::string targetCompress;
 				std::string targetDecompress;
-				char* data = samples.data();
-				for (int i{}; i < 20; ++i) {
+                for (int i{}; i < samplesTest.size(); ++i) {
 					// compress
 					targetCompress.clear();
-					sizeCompressBound = ZSTD_compressBound(samplesSizes[i]);
+                    sizeCompressBound = ZSTD_compressBound(samplesTest[i].size());
 					targetCompress.resize(sizeCompressBound);
 
-					sizeCompress = ZSTD_compress_usingCDict(comCtx, targetCompress.data(), sizeCompressBound, data, samplesSizes[i], cdict);
+                    sizeCompress =
+                        ZSTD_compress_usingCDict(comCtx, targetCompress.data(), sizeCompressBound, samplesTest[i].data(), samplesTest[i].size(), cdict);
 					// must do
 					targetCompress.resize(sizeCompress);
 					// decompress
@@ -388,11 +407,11 @@ int main() {
 					if (ZSTD_isError(sizeDecompress)) {
 						qDebug() << ZSTD_getErrorName(sizeDecompress);
 					}
-					assert(samplesSizes[i] == sizeDecompress);
-					qDebug() << samplesSizes[i] << " -> " << sizeCompress << " -> " << sizeDecompress;
+                    assert(samplesTest[i].size() == sizeDecompress);
+                    assert(targetDecompress == samplesTest[i]);
+                    qDebug() << samplesTest[i].size() << " -> " << sizeCompress << " -> " << sizeDecompress;
 
 					//----------------------
-					data += samplesSizes[i];
 				}
 				ZSTD_freeCCtx(comCtx);
 				ZSTD_freeDCtx(decomCtx);
