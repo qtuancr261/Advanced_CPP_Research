@@ -34,7 +34,7 @@ void zenString(std::string& result, size_t len, bool isPrintable) {
 	std::uniform_int_distribution<char> dis(min, max);
 	result.resize(len);
 	for (int i{}; i < len; ++i) {
-		result[i] = (dis(randEngine));
+        result[i] = (dis(randEngine));
 	}
 }
 
@@ -47,7 +47,7 @@ void readMsgPattern(std::string& msgPattern) {
 		QTextStream readStream(&msgPatternFile);
 		while (readStream.readLineInto(&line)) {
 			pattern.append(line);
-			line.clear();
+            // line.clear();
 		}
 	}
 	// 1: cash
@@ -58,6 +58,7 @@ void readMsgPattern(std::string& msgPattern) {
 	msgPattern = pattern.toStdString();
 	// std::cout << msgPattern;
 	// qDebug() << genMsg;
+    msgPatternFile.close();
 }
 
 void genMsgFromPattern(std::string& samples, size_t* samplesSizes, const std::string& pattern, size_t numMsg) {
@@ -89,7 +90,7 @@ void genMsgTestFromPattern(std::vector<string>& samples, const std::string& patt
     }
 }
 
-void readMsgTemplate(std::string& msg) {
+void readMsg(std::string& msg) {
 	QFile msgTempFile("zns_msgp.245111.html");
 	if (msgTempFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		QTextStream readStream(&msgTempFile);
@@ -100,23 +101,7 @@ void readMsgTemplate(std::string& msg) {
 		}
 	}
 }
-static void BM_StringCreation(benchmark::State& state) {
-    for (auto _ : state) std::string empty_string;
-}
 
-// Register the function as a benchmark
-BENCHMARK(BM_StringCreation);
-
-static void BM_StringCopy(benchmark::State& state) {
-	std::string x = "hello";
-	for (auto _ : state) std::string copy(x);
-}
-// BENCHMARK(BM_StringCopy);
-
-// memcpy as default ratio
-
-// Begin benchmark
-// BENCHMARK_MAIN();
 std::string example(1000, 'z');
 std::string target(4096, 'a');
 std::string decompressTarget(1000, 'b');
@@ -128,9 +113,12 @@ size_t sizeDBound{};
 std::unique_ptr<char[]> targetData{nullptr};
 std::unique_ptr<char[]> decompressData{nullptr};
 
+std::vector<std::string> zstdSamples;
+std::vector<std::string> zstdCompressSamples;
+
 static void BM_memcpy(benchmark::State& state) {
 	example.clear();
-	readMsgTemplate(example);
+    readMsg(example);
 	target.resize(example.size());
 	for (auto _ : state) {
 		memcpy(target.data(), example.data(), example.size());
@@ -142,7 +130,7 @@ BENCHMARK(BM_memcpy);
 
 static void BM_LZ4_compress_default(benchmark::State& state) {
 	example.clear();
-	readMsgTemplate(example);
+    readMsg(example);
 	sizeCompressBound = LZ4_compressBound(example.size());
 	target.resize(sizeCompressBound);
 	for (auto _ : state) {
@@ -169,7 +157,7 @@ BENCHMARK(BM_LZ4_decompress_safe);
 
 static void BM_snappy_compress(benchmark::State& state) {
 	example.clear();
-	readMsgTemplate(example);
+    readMsg(example);
 	target.clear();
 	for (auto _ : state) {
 		sizeCompress = snappy::Compress(example.data(), example.size(), &target);
@@ -191,7 +179,7 @@ BENCHMARK(BM_snappy_decompress);
 
 static void BM_snappy_c_compress(benchmark::State& state) {
 	example.clear();
-	readMsgTemplate(example);
+    readMsg(example);
 	sizeCompressBound = snappy_max_compressed_length(example.size());
 	// char* targetData{new char[sizeCompressBound]};
 	targetData.reset(new char[sizeCompressBound]);
@@ -225,7 +213,7 @@ BENCHMARK(BM_snappy_c_decompress);
 
 static void BM_zstd_compress(benchmark::State& state) {
 	example.clear();
-	readMsgTemplate(example);
+    readMsg(example);
 	target.clear();
 	sizeCompressBound = ZSTD_compressBound(example.size());
 	target.resize(sizeCompressBound);
@@ -257,7 +245,7 @@ static void BM_zstd_compress_context(benchmark::State& state) {
 	// same compress ratio with zstd_compress
 	// optimize speed / resource
 	example.clear();
-	readMsgTemplate(example);
+    readMsg(example);
 	target.clear();
 	ZSTD_CCtx* comContext = ZSTD_createCCtx();
 	sizeCompressBound = ZSTD_compressBound(example.size());
@@ -292,6 +280,11 @@ static void BM_zstd_decompress_context(benchmark::State& state) {
 }
 
 BENCHMARK(BM_zstd_decompress_context);
+
+static void BM_zstd_compress_use_dict(benchmark::State& state) {
+    std::string pattern;
+    readMsgPattern(pattern);
+}
 
 // BENCHMARK_MAIN();
 int main() {
@@ -409,7 +402,7 @@ int main() {
 					}
                     assert(samplesTest[i].size() == sizeDecompress);
                     assert(targetDecompress == samplesTest[i]);
-                    qDebug() << samplesTest[i].size() << " -> " << sizeCompress << " -> " << sizeDecompress;
+                    qDebug() << samplesTest[i].size() << " -> " << sizeCompress << " -> " << sizeDecompress << " | dictID: " << actualDictID;
 
 					//----------------------
 				}
