@@ -7,8 +7,8 @@ TemplatePCMsg::TemplatePCMsg()
     , _msgSamplesBSizes{nullptr}
     , _numSamplesB{}
     , _msgSamplesTest{}
-    , _compCtxPtr{nullptr}
-    , _decompCtxPtr{nullptr}
+    , _compCtxPtr{ZSTD_createCCtx()}
+    , _decompCtxPtr{ZSTD_createDCtx()}
     , _compDictPtr{nullptr}
     , _decompDictPtr{nullptr} {
     //
@@ -19,6 +19,9 @@ TemplatePCMsg::~TemplatePCMsg() {
     if (_dictBuffer) {
         free(_dictBuffer);
     }
+
+    ZSTD_freeCCtx(_compCtxPtr);
+    ZSTD_freeDCtx(_decompCtxPtr);
 }
 
 void TemplatePCMsg::readPatternFromFile(std::string fileName) {
@@ -87,7 +90,7 @@ void TemplatePCMsg::genMsgBuildFromPattern(size_t numMsg) {
     }
 }
 
-void TemplatePCMsg::trainDictBuffer() {
+void TemplatePCMsg::trainDict() {
     // make sure we have samples for build
     if (_msgSamplesBuild.empty()) {
         genMsgBuildFromPattern(TRAIN_SAMPLES_SIZE);
@@ -99,14 +102,15 @@ void TemplatePCMsg::trainDictBuffer() {
     }
     size_t dictSize{ZDICT_trainFromBuffer(_dictBuffer, TRAIN_DICT_SIZE, _msgSamplesBuild.data(), _msgSamplesBSizes.get(), _numSamplesB)};
     qDebug() << "Train dict size: " << dictSize;
+
+    _compDictPtr = ZSTD_createCDict(_dictBuffer, dictSize, ZSTD_fast);
+    _decompDictPtr = ZSTD_createDDict(_dictBuffer, dictSize);
 }
 
-ZSTD_CCtx* TemplatePCMsg::getCompCtx() const {
-    static thread_local ZSTD_CCtx* cCtx{ZSTD_createCCtx()};
-    return cCtx;
-}
+ZSTD_CCtx *TemplatePCMsg::getCompCtx() const { return _compCtxPtr; }
 
-ZSTD_DCtx* TemplatePCMsg::getDecompCtx() const {
-    static thread_local ZSTD_DCtx* dCtx{ZSTD_createDCtx()};
-    return dCtx;
-}
+ZSTD_DCtx *TemplatePCMsg::getDecompCtx() const { return _decompCtxPtr; }
+
+size_t TemplatePCMsg::compressUseDict(std::string &dst, const std::string &src) {}
+
+size_t TemplatePCMsg::decompressUseDict(std::string &dst, const std::string &src) {}

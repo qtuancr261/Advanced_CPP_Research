@@ -55,10 +55,13 @@ public:
 
     void genMsgBuildFromPattern(size_t numMsg);
 
-    void trainDictBuffer();
+    void trainDict();
 
     ZSTD_CCtx* getCompCtx() const;
     ZSTD_DCtx* getDecompCtx() const;
+
+    size_t compressUseDict(std::string& dst, const std::string& src);
+    size_t decompressUseDict(std::string& dst, const std::string& src);
 };
 
 #endif	// TEMPLATEPCMSG_H
