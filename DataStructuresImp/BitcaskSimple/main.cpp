@@ -9,6 +9,10 @@ class A {};
 
 int main() {
 	KVPairLog<int, int> _idNameLogs{rootPath, logName};
-	_idNameLogs.compactionLogSegment();
-	return 0;
+    int key{2610};
+    int value{2020};
+    _idNameLogs.writeKVPair(key, value);
+    int readValue{};
+    _idNameLogs.readKey(readValue, key);
+    return 0;
 }
