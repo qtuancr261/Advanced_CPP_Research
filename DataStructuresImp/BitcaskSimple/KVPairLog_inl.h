@@ -59,21 +59,23 @@ inline void KVPairLog<KType, VType>::writeKVPair(const KType &key, const VType &
 template <typename KType, typename VType>
 inline bool KVPairLog<KType, VType>::readKey(VType &retValue, const KType &key) {
 	// <3 wait
-    auto searchIt = _inMemKOffsetHashMap.find(key);
+    // or use: auto searchIt <3
+    InMemMapConstIter searchIt = _inMemKOffsetHashMap.find(key);
     if (searchIt != _inMemKOffsetHashMap.end()) {
-        //        off_t valueOffset = searchIt->second();
-        off_t valueOffset = 0;
+        off_t valueOffset = searchIt->second;
         int fileFd{open(_logFileName.c_str(), O_RDONLY)};
         if (fileFd < 0) {
             std::cerr << "Open " << _logFileName << " failed";
             return false;
         }
-        lseek(fileFd, valueOffset, SEEK_SET);
+        // lseek(fileFd, valueOffset, SEEK_SET);
         size_t kSize{};
-        read(fileFd, &kSize, sizeof(size_t));
+        // read(fileFd, &kSize, sizeof(size_t));
+        pread(fileFd, &kSize, sizeof(size_t), valueOffset);
         std::clog << "kSize " << kSize;
-	KType rKey{};
-        read(fileFd, &rKey, kSize);
+        KType rKey{};
+        // read(fileFd, &rKey, kSize);
+        pread(fileFd, &rKey, kSize, valueOffset + sizeof(size_t));
         std::clog << "rKey " << rKey;
         close(fileFd);
         return true;

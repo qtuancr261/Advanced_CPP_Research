@@ -11,7 +11,11 @@
 template <typename KType, typename VType>
 class KVPairLog {
 private:
+    using InMemMap = std::unordered_map<KType, off_t>;
+    using InMemMapIter = typename std::unordered_map<KType, off_t>::iterator;
+    using InMemMapConstIter = typename std::unordered_map<KType, off_t>::const_iterator;
 	std::unordered_map<KType, off_t> _inMemKOffsetHashMap;
+
 	//
 	std::string _dirPath;
 	std::string _logFileName;
