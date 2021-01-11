@@ -21,6 +21,7 @@ private:
 	std::string _logFileName;
 	int _currentWriteLogFileId;
 	int _logFileFd;
+    struct stat _logFileStat;
 	uint64_t _MAX_LOG_FILE_SIZE;  // may be 10MB per log file
     off_t _currentOffset;         // use for write a new key
 public:

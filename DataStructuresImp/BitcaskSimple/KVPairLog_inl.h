@@ -9,6 +9,7 @@ inline KVPairLog<KType, VType>::KVPairLog(const std::string &rootPath, const std
       _logFileName{logName},
       _currentWriteLogFileId{0},
       _logFileFd{-1},
+      _logFileStat{},
       _MAX_LOG_FILE_SIZE{10000000},
       _currentOffset{0} {
 	// <3 wait
@@ -31,6 +32,10 @@ inline void KVPairLog<KType, VType>::writeKVPair(const KType &key, const VType &
             std::cerr << "Open " << _logFileName << " failed \n";
             return;
         }
+        fstat(_logFileFd, &_logFileStat);
+        std::clog << "log file stat " << _logFileStat.st_size << std::endl;
+        // WAL log, get the last byte offset
+        if (_logFileStat.st_size > 0) _currentOffset = lseek(_logFileFd, 0, SEEK_END);
     }
     // write a record | frame size | keysize | key | 4+ |value
     size_t kSize{0};
@@ -41,8 +46,14 @@ inline void KVPairLog<KType, VType>::writeKVPair(const KType &key, const VType &
     }
 
     _inMemKOffsetHashMap[key] = _currentOffset;
+
+    std::clog << _currentOffset << std::endl;
     _currentOffset += write(_logFileFd, &kSize, sizeof(size_t));
+    off_t curOffset = lseek(_logFileFd, 0, SEEK_CUR);
+    std::clog << curOffset << std::endl;
+    std::clog << _currentOffset << std::endl;
     _currentOffset += write(_logFileFd, &key, kSize);
+
     std::clog << "Write " << _currentOffset << std::endl;
     size_t vSize{0};
     if (std::is_fundamental<VType>::value) {
