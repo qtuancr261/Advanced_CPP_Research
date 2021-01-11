@@ -62,7 +62,7 @@ inline bool KVPairLog<KType, VType>::readKey(VType &retValue, const KType &key) 
     // or use: auto searchIt <3
     InMemMapConstIter searchIt = _inMemKOffsetHashMap.find(key);
     if (searchIt != _inMemKOffsetHashMap.end()) {
-        off_t valueOffset = searchIt->second;
+        off_t offset = searchIt->second;
         int fileFd{open(_logFileName.c_str(), O_RDONLY)};
         if (fileFd < 0) {
             std::cerr << "Open " << _logFileName << " failed";
@@ -71,12 +71,39 @@ inline bool KVPairLog<KType, VType>::readKey(VType &retValue, const KType &key) 
         // lseek(fileFd, valueOffset, SEEK_SET);
         size_t kSize{};
         // read(fileFd, &kSize, sizeof(size_t));
-        pread(fileFd, &kSize, sizeof(size_t), valueOffset);
-        std::clog << "kSize " << kSize;
+        auto rsize = pread(fileFd, &kSize, sizeof(size_t), offset);
+        if (rsize <= 0) {
+            std::clog << "Read kSize failed: " << rsize;
+            return false;
+        }
+        offset += rsize;
+        std::clog << "kSize " << kSize << std::endl;
+
         KType rKey{};
         // read(fileFd, &rKey, kSize);
-        pread(fileFd, &rKey, kSize, valueOffset + sizeof(size_t));
-        std::clog << "rKey " << rKey;
+        rsize = pread(fileFd, &rKey, kSize, offset);
+        if (rsize <= 0) {
+            std::clog << "Read key failed: " << rsize;
+            return false;
+        }
+        offset += rsize;
+        std::clog << "rKey " << rKey << std::endl;
+
+        size_t vSize{};
+        rsize = pread(fileFd, &vSize, sizeof(size_t), offset);
+        if (rsize <= 0) {
+            std::clog << "Read vSize failed: " << rsize;
+            return false;
+        }
+        offset += rsize;
+        std::clog << "vSize " << vSize << std::endl;
+
+        rsize = pread(fileFd, &retValue, vSize, offset);
+        if (rsize < 0) {
+            std::clog << "Read value failed " << rsize << std::endl;
+        }
+        std::clog << "value " << retValue << std::endl;
+
         close(fileFd);
         return true;
     }
