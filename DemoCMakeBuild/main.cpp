@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include "StopWatch.h"
 using namespace::std;
 const uint8_t IV_Mask[] = {26, 199, 14, 203, 120, 77, 12, 149};
 const int IVSize = 8;
@@ -35,6 +36,7 @@ void outIV(uint8_t* IV, int IVLen) {
 }
 int main(int argc, char *argv[])
 {
+    StopWatch clock;
     uint8_t* IV = new uint8_t[IVSize];
     for (int var = 0; var < IVSize; ++var) {
         IV[var] = rand() % 256;
@@ -44,5 +46,6 @@ int main(int argc, char *argv[])
     outIV(IV, IVSize);
     decryptIV(IV, IVSize);
     outIV(IV, IVSize);
+    cout << "Elapsed: " << clock.elapsedSec() << endl;
     return 0;
 }
