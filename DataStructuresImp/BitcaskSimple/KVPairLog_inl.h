@@ -4,15 +4,15 @@
 
 template <typename KType, typename VType>
 inline KVPairLog<KType, VType>::KVPairLog(const std::string &rootPath, const std::string logName)
-    : _inMemKOffsetHashMap{},
-      _dirPath{rootPath},
-      _logFileName{logName},
-      _currentWriteLogFileId{0},
-      _logFileFd{-1},
-      _logFileStat{},
-      _MAX_LOG_FILE_SIZE{10000000},
-      _currentOffset{0} {
-	// <3 wait
+    : _inMemKOffsetHashMap{}
+    , _dirPath{rootPath}
+    , _logFileName{logName}
+    , _currentWriteLogFileId{0}
+    , _logFileFd{-1}
+    , _logFileStat{}
+    , _MAX_LOG_FILE_SIZE{10000000}
+    , _currentOffset{0} {
+    // <3 wait
     static_assert(!std::is_pointer<KType>::value, "KType not support pointer");
     static_assert(!std::is_pointer<VType>::value, "VType not support pointer");
 }
@@ -24,7 +24,7 @@ inline KVPairLog<KType, VType>::~KVPairLog() {
 
 template <typename KType, typename VType>
 inline void KVPairLog<KType, VType>::writeKVPair(const KType &key, const VType &value) {
-	// <3 wait
+    // <3 wait
     if (_logFileFd < 0) {
         _logFileName.append("_").append(std::to_string(_currentWriteLogFileId));
         _logFileFd = open(_logFileName.c_str(), O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR);
@@ -69,7 +69,7 @@ inline void KVPairLog<KType, VType>::writeKVPair(const KType &key, const VType &
 
 template <typename KType, typename VType>
 inline bool KVPairLog<KType, VType>::readKey(VType &retValue, const KType &key) {
-	// <3 wait
+    // <3 wait
     // or use: auto searchIt <3
     InMemMapConstIter searchIt = _inMemKOffsetHashMap.find(key);
     if (searchIt != _inMemKOffsetHashMap.end()) {
@@ -123,7 +123,7 @@ inline bool KVPairLog<KType, VType>::readKey(VType &retValue, const KType &key) 
 
 template <typename KType, typename VType>
 inline bool KVPairLog<KType, VType>::compactionLogSegment() {
-	// <3 wait
+    // <3 wait
 }
 
-#endif  // KVPAIRLOG_INL_H
+#endif	// KVPAIRLOG_INL_H
