@@ -35,4 +35,45 @@ bool LoopRunnable::wait(uint64_t milliSecs) {
     }
 
     std::unique_lock<std::mutex> lock{_eventMutex};
+    if (_event.wait_for(lock, std::chrono::milliseconds(milliSecs)) == std::cv_status::timeout) {
+        _isWaitting.exchange(false);
+        printDebug(LoopRunnable::wait, "wait_for timeout");
+        return false;
+    }
+    return true;
 }
+
+bool LoopRunnable::breakWait() {
+    if (_isWaitting.exchange(false) == true) {
+        std::lock_guard<std::mutex> lock{_eventMutex};
+        _event.notify_one();
+        return true;
+    }
+    return false;
+}
+
+void LoopRunnable::reqStop(bool reqBreakWait) {
+    _isReqStop.exchange(true);
+    if (reqBreakWait) {
+        breakWait();
+    }
+}
+
+LoopRunnable& LoopRunnable::reset() {
+    _isReqStop.exchange(false);
+    _isRunning.exchange(false);
+    _isWaitting.exchange(false);
+    _loop.exchange(0);
+    _startTime = 0;
+    return *this;
+}
+
+bool LoopRunnable::isRunning() const { return _isRunning.load(); }
+
+bool LoopRunnable::isWaiting() const { return _isWaitting.load(); }
+
+size_t LoopRunnable::getNLoop() const { return _loop.load(); }
+
+std::string LoopRunnable::getName() const { return _name; }
+
+time_t LoopRunnable::getStartTime() const { return _startTime; }
