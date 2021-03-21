@@ -20,7 +20,7 @@ private:
 
 public:
     stack_empty() = default;
-    const char* what() const noexcept { return message.c_str(); }
+    const char* what() const noexcept override { return message.c_str(); }
     ~stack_empty() = default;
 };
 
@@ -46,20 +46,26 @@ public:
 
     void push(const T& value) {
         std::lock_guard<std::mutex> lockData{_dataMutex};
-        _data.push(value);
+        // only one thread is ever actually doing any work
+        // in the data stuctures at a time
+        // => Serialization
+        // Limit the perf of an app, while a thread is waiting
+        // for the lock. it isn't doing any useful work
+        // Consider condition_variable use case with ThreadSafeQueue
+        _data.push(std::move(value));
     }
 
     void pop(T& poppedValue) {
         std::lock_guard<std::mutex> lockData{_dataMutex};
         if (_data.empty()) throw stack_empty();
-        poppedValue = _data.top();
+        poppedValue = std::move(_data.top());
         _data.pop();
     }
 
     shared_ptr<T> pop() {
         std::lock_guard<std::mutex> lockData{_dataMutex};
         if (_data.empty()) throw stack_empty();
-        shared_ptr<T> topValue{make_shared<T>(_data.top())};
+        shared_ptr<T> topValue{make_shared<T>(std::move(_data.top()))};
         _data.pop();
         return topValue;
     }
@@ -85,11 +91,11 @@ public:
         if (this == &other) return;
         // the same approach as swapV1 by using std::unique_lock and std::defer_lock
         // std::defer_lock : do not acquire ownership of the mutex
-        std::unique_lock<std::mutex> lock1(this->_dataMutex, std::defer_lock);  // leave the mutex unlocked
+        std::unique_lock<std::mutex> lock1(this->_dataMutex, std::defer_lock);	// leave the mutex unlocked
         std::unique_lock<std::mutex> lock2(this->_dataMutex, std::defer_lock);
         // we can pass std::unique_lock to std::lock function
         std::lock(lock1, lock2);  // we lock the two std::unique_lock here (it has lock(), unlock(), try_lock() as a normal mutex)
         std::swap(this->_data, other._data);
     }
 };
-#endif  // THREADSAFESTACK_H
+#endif	// THREADSAFESTACK_H
