@@ -11,12 +11,12 @@ HEADERS += \
     FeedBackRegister.h \
     TemplatePCMsg.h
 
-unix:!macx: LIBS += -L$$PWD/../../benchmark_lib/google_benchmark/lib/ -lbenchmark
+unix:!macx: LIBS += -L$$PWD/../../static_libs/benchmark_lib/google_benchmark/lib/ -lbenchmark
 
-INCLUDEPATH += $$PWD/../../benchmark_lib
-DEPENDPATH += $$PWD/../../benchmark_lib
+INCLUDEPATH += $$PWD/../../static_libs/benchmark_lib
+DEPENDPATH += $$PWD/../../static_libs/benchmark_lib
 
-unix:!macx: PRE_TARGETDEPS += $$PWD/../../benchmark_lib/google_benchmark/lib/libbenchmark.a
+unix:!macx: PRE_TARGETDEPS += $$PWD/../../static_libs/benchmark_lib/google_benchmark/lib/libbenchmark.a
 
 LIBS += \
         -lpthread \
