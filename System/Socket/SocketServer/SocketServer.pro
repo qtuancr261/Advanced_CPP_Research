@@ -45,50 +45,24 @@ HEADERS += \
 #unix:!macx: PRE_TARGETDEPS += $$PWD/../poco/lib/libpoco.a
 ## LEGACY ######################################################
 
+unix:!macx: LIBS += -L$$PWD/../Poco/lib/ -lPocoUtil -lPocoNet  -lPocoXML -lPocoJSON -lPocoFoundation
 
-## NEW
-# Poco Foundation
-#INCLUDEPATH += $$PWD/../Poco/Foundation/include/ \
-#                $$PWD/../Poco/Util/include/ \
-#                $$PWD/../Poco/XML/include/ \
-#                $$PWD/../Poco/JSON/include/ \
-#LIBS += -L$$PWD/../Poco/lib/ -lPocoFoundation
-
+INCLUDEPATH += $$PWD/../Poco/Util/include \
+               $$PWD/../Poco/Net/include \
+               $$PWD/../Poco/XML/include \
+               $$PWD/../Poco/JSON/include \
+               $$PWD/../Poco/Foundation/include \
 
 
+DEPENDPATH += $$PWD/../Poco/Util/include \
+              $$PWD/../Poco/Net/include \
+              $$PWD/../Poco/XML/include \
+              $$PWD/../Poco/JSON/include \
+              $$PWD/../Poco/Foundation/include \
 
-unix:!macx: LIBS += -L$$PWD/../Poco/lib/ -lPocoUtil
-
-INCLUDEPATH += $$PWD/../Poco/Util/include
-DEPENDPATH += $$PWD/../Poco/Util/include
-
-unix:!macx: PRE_TARGETDEPS += $$PWD/../Poco/lib/libPocoUtil.a
-
-unix:!macx: LIBS += -L$$PWD/../Poco/lib/ -lPocoNet
-
-INCLUDEPATH += $$PWD/../Poco/Net/include
-DEPENDPATH += $$PWD/../Poco/Net/include
-
-unix:!macx: PRE_TARGETDEPS += $$PWD/../Poco/lib/libPocoNet.a
-
-unix:!macx: LIBS += -L$$PWD/../Poco/lib/ -lPocoXML
-
-INCLUDEPATH += $$PWD/../Poco/XML/include
-DEPENDPATH += $$PWD/../Poco/XML/include
-
-unix:!macx: PRE_TARGETDEPS += $$PWD/../Poco/lib/libPocoXML.a
-
-unix:!macx: LIBS += -L$$PWD/../Poco/lib/ -lPocoJSON
-
-INCLUDEPATH += $$PWD/../Poco/JSON/include
-DEPENDPATH += $$PWD/../Poco/JSON/include
-
-unix:!macx: PRE_TARGETDEPS += $$PWD/../Poco/lib/libPocoJSON.a
-
-unix:!macx: LIBS += -L$$PWD/../Poco/lib/ -lPocoFoundation
-
-INCLUDEPATH += $$PWD/../Poco/Foundation/include
-DEPENDPATH += $$PWD/../Poco/Foundation/include
-
-unix:!macx: PRE_TARGETDEPS += $$PWD/../Poco/lib/libPocoFoundation.a
+unix:!macx: PRE_TARGETDEPS += $$PWD/../Poco/lib/libPocoUtil.a \
+                              $$PWD/../Poco/lib/libPocoNet.a \
+                              $$PWD/../Poco/lib/libPocoXML.a \
+                              $$PWD/../Poco/lib/libPocoJSON.a \
+                              $$PWD/../Poco/lib/libPocoFoundation.a \
 
