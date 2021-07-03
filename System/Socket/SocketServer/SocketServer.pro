@@ -2,6 +2,7 @@ QT -= gui
 
 CONFIG += c++17 console
 CONFIG -= app_bundle
+#CONFIG -= qt
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked deprecated (the exact warnings
@@ -35,15 +36,59 @@ HEADERS += \
 #INCLUDEPATH += ../zpoco/inc
 #LIBS += ../../zpoco/lib/libzpoco.a
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../poco/lib/release/ -lpocod
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../poco/lib/debug/ -lpocod
-else:unix: LIBS += -L$$PWD/../poco/lib/ -lpocod
+## LEGACY ######################################################
+#unix:!macx: LIBS += -L$$PWD/../poco/lib/ -lpoco
 
-INCLUDEPATH += $$PWD/../poco/inc
-DEPENDPATH += $$PWD/../poco/inc
+#INCLUDEPATH += $$PWD/../poco/inc
+#DEPENDPATH += $$PWD/../poco/inc
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../poco/lib/release/libpocod.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../poco/lib/debug/libpocod.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../poco/lib/release/pocod.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../poco/lib/debug/pocod.lib
-else:unix: PRE_TARGETDEPS += $$PWD/../poco/lib/libpocod.a
+#unix:!macx: PRE_TARGETDEPS += $$PWD/../poco/lib/libpoco.a
+## LEGACY ######################################################
+
+
+## NEW
+# Poco Foundation
+#INCLUDEPATH += $$PWD/../Poco/Foundation/include/ \
+#                $$PWD/../Poco/Util/include/ \
+#                $$PWD/../Poco/XML/include/ \
+#                $$PWD/../Poco/JSON/include/ \
+#LIBS += -L$$PWD/../Poco/lib/ -lPocoFoundation
+
+
+
+
+unix:!macx: LIBS += -L$$PWD/../Poco/lib/ -lPocoUtil
+
+INCLUDEPATH += $$PWD/../Poco/Util/include
+DEPENDPATH += $$PWD/../Poco/Util/include
+
+unix:!macx: PRE_TARGETDEPS += $$PWD/../Poco/lib/libPocoUtil.a
+
+unix:!macx: LIBS += -L$$PWD/../Poco/lib/ -lPocoNet
+
+INCLUDEPATH += $$PWD/../Poco/Net/include
+DEPENDPATH += $$PWD/../Poco/Net/include
+
+unix:!macx: PRE_TARGETDEPS += $$PWD/../Poco/lib/libPocoNet.a
+
+unix:!macx: LIBS += -L$$PWD/../Poco/lib/ -lPocoXML
+
+INCLUDEPATH += $$PWD/../Poco/XML/include
+DEPENDPATH += $$PWD/../Poco/XML/include
+
+unix:!macx: PRE_TARGETDEPS += $$PWD/../Poco/lib/libPocoXML.a
+
+unix:!macx: LIBS += -L$$PWD/../Poco/lib/ -lPocoJSON
+
+INCLUDEPATH += $$PWD/../Poco/JSON/include
+DEPENDPATH += $$PWD/../Poco/JSON/include
+
+unix:!macx: PRE_TARGETDEPS += $$PWD/../Poco/lib/libPocoJSON.a
+
+unix:!macx: LIBS += -L$$PWD/../Poco/lib/ -lPocoFoundation
+
+INCLUDEPATH += $$PWD/../Poco/Foundation/include
+DEPENDPATH += $$PWD/../Poco/Foundation/include
+
+unix:!macx: PRE_TARGETDEPS += $$PWD/../Poco/lib/libPocoFoundation.a
+
