@@ -29,7 +29,7 @@ using std::vector;
 using RoomChatPtr = shared_ptr<RoomChat>;
 class ServerApp : public Application {
 private:
-    inline static const int MAX_CONNECTION{5};
+    inline static const int MAX_PENDING_CONNECTION{5};
     RoomChatPtr _publicRoom;
     vector<RoomChatPtr> _privatesRoom;
 
@@ -49,4 +49,4 @@ public:
     void handleNewConnection(int clientSocket);
 };
 
-#endif  // SERVERAPP_H
+#endif	// SERVERAPP_H

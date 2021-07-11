@@ -1,13 +1,13 @@
 #include "client_core.h"
 
 Client_Core::Client_Core()
-    : fileName{},
-      binaryData{nullptr},
-      send_message{nullptr},
-      dataSize{0},
-      clientFD{-1},
-      MESSAGE_SIZE{200},
-      RECV_MESSAGE_SIZE{200000}
+    : fileName{}
+    , binaryData{nullptr}
+    , send_message{nullptr}
+    , dataSize{0}
+    , clientFD{-1}
+    , MESSAGE_SIZE{200}
+    , RECV_MESSAGE_SIZE{200000}
 
 {
     clientFD = socket(AF_INET, SOCK_STREAM, 0);
@@ -22,6 +22,9 @@ bool Client_Core::connectToServer(int serverPort, const char* serverAddress) con
     server.sin_family = AF_INET;
     server.sin_port = htons(serverPort);
     server.sin_addr.s_addr = inet_addr(serverAddress);
+    /* System call: connect(sockfd, struct sockaddr*, socklent_t)
+     * - connect the active socket referred to by the socketfd to the listening socket- specified by sockaddr* and socklen_t
+     */
     if (connect(clientFD, (sockaddr*)&server, sizeof(server)) < 0) return false;
     return true;
 }
