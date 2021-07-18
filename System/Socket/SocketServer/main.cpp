@@ -90,13 +90,13 @@ void* handleNewClientConnection(void* client_socket) {
     printf("Client disconnected\n");
     return 0;
 }
-int main() {
-    BufferWrapper::serializeDeserializeNumber();
-    BufferWrapper::serializeDeserializeString();
-    MessageClientReqRegister::testSerializeDeserialize();
+int main(int argc, char* argv[]) {
+    //    BufferWrapper::serializeDeserializeNumber();
+    //    BufferWrapper::serializeDeserializeString();
+    //    MessageClientReqRegister::testSerializeDeserialize();
     try {
         ServerApp app;
-        return app.run();
+        return app.run(argc, argv);
     } catch (Poco::Exception& exc) {
         std::cerr << exc.what();
     }

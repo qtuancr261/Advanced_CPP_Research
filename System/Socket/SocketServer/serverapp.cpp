@@ -1,105 +1,74 @@
-/*
- * Author: tuantq3
- * File: serverapp.cpp
- *
- * Created on 26/8/2019
- */
 #include "serverapp.h"
 
-ServerApp::ServerApp() {}
+ServerApp::ServerApp()
+    : _isPrintHelp{false} {}
 
-void ServerApp::initialize(Poco::Util::Application &self) {}
+void ServerApp::initialize(Poco::Util::Application &self) {
+    std::clog << " Initializing ...\n";
+    _serverHandlerPtr.release();
+    _serverHandlerPtr = make_unique<ServerCore>("SocketServer", _sockDomain, SOCK_STREAM, _portOrUnixPath);
+    addSubsystem(_serverHandlerPtr.get());
+    Application::initialize(self);
+}
 
-void ServerApp::uninitialize() {}
+void ServerApp::uninitialize() {
+    std::clog << " Uninitializing ...\n";
+    Application::uninitialize();
+}
 
 void ServerApp::reinitialize(Poco::Util::Application &selft) {}
 
-void ServerApp::defineOptions(Poco::Util::OptionSet &options) {}
+void ServerApp::defineOptions(Poco::Util::OptionSet &options) {
+    Application::defineOptions(options);
+    options.addOption(Option("help", "h", "display help", false));
+    options.addOption(Option("domain", "d", "set socket domain", true, "domain type", true));
+    options.addOption(Option("port", "p", "set path for AF_UNIX or port for AF_INET/INET6", true, "port/path", true));
+}
 
-void ServerApp::handleOption(const std::string &name, const std::string &value) {}
+void ServerApp::handleOption(const std::string &name, const std::string &value) {
+    if (name == "help") {
+        std::cout << "Display help \n";
+        _isPrintHelp = true;
+        handlePrintHelp();
+        stopOptionsProcessing();
+        return;
+    }
+    if (name == "domain") {
+        std::cout << "Domain type: " << value << std::endl;
+        if (value == "AF_UNIX")
+            _sockDomain = AF_UNIX;
+        else if (value == "AF_INET")
+            _sockDomain = AF_INET;
+        else if (value == "AF_INET6")
+            _sockDomain = AF_INET6;
+        return;
+    }
+    if (name == "port") {
+        std::cout << "Port/path: " << value << std::endl;
+        _portOrUnixPath = value;
+        return;
+    }
+}
+
+void ServerApp::handlePrintHelp() const {
+    auto itOptionBeg = options().begin();
+    auto itOptionEnd = options().end();
+    std::cout << "Usage\n";
+    for (; itOptionBeg != itOptionEnd; ++itOptionBeg) {
+        std::cout << " -" << itOptionBeg->shortName() << " --" << itOptionBeg->fullName() << " " << itOptionBeg->description() << "\n";
+    }
+}
 
 int ServerApp::main(const std::vector<std::string> &args) {
-    /* System call: fd = socket(domain, type, protocol)
-     *
-     * Socket domains:                                                       Address structure   Address format
-     * - AF_UNIX:  same host:                                                sockaddr_un         pathname
-     * - AF_INET:  hosts connected via an IPv4 network:                      sockaddr_in         32-bit ipv4 address + 16-bit port number
-     * - AF_INET6: hosts connected via an IPv6 network:                      sockaddr_in6        128-bit ipv6 address + 16 bit port number
-     * - ...
-     * Socket types:
-     * - SOCK_STREAM: reliable, bidirectional, byte-stream -> TCP
-     * - SOCK_DGRAM: connectionless -> UDP
-     * - ...
-     * Socket protocol: specified as 0 (non-0 protocol value are used with some socket types)
-     *
-     *
-     */
-    int socketServer{socket(AF_INET, SOCK_STREAM, 0)};
-    if (socketServer < 0) {
-        std::cerr << "Couldn't create socket ";
-        return EX_OSERR;
+    if (_isPrintHelp) {
+        return EXIT_OK;
     }
-
-    sockaddr_in serverInfo{};
-    serverInfo.sin_family = AF_INET;
-    serverInfo.sin_port = htons(2610);
-    serverInfo.sin_addr.s_addr = INADDR_ANY;
-
-    /* System call: bind(sockfd, struct sockaddr*, socklen_t)
-     * - sockaddr* : structure specifying the address to which this sockfd is to be bound
-     * type of structure passed depends on the socket domain: AF_INET -> sockaddr_in
-     * ** struct sockaddr: generic socket address structure
-     * {
-     *    sa_family_t sa_family;   address family
-     *    char        sa_data[14]; Socket address
-     * }
-     * - socklen_t : the size ofthe address structure
-     */
-    if (bind(socketServer, (sockaddr *)&serverInfo, sizeof(serverInfo)) < 0) {
-        std::cerr << "Couldn't bind socket \n";
-        return EX_OSERR;
-    }
-    /* System call: listen(sockfd, backlog)
-     * passive socket
-     * the socket is used to accept connections from other (active) socket
-     *
-     */
-    if (listen(socketServer, MAX_PENDING_CONNECTION) < 0) {
-        std::cerr << "Couldn't listen to socket \n";
-        return EXIT_OSERR;
-    }
-    std::cout << "Waiting for incoming connection ......... \n";
-
-    vector<unique_ptr<thread>> threads{};
-    sockaddr_in clientInfo{};
-    int clLen{sizeof(clientInfo)};
-    int socketClient{};
-    while (true) {
-        /* System call: accept(sockfd, struct sockadd*, socklen_t*)
-         * Return: new socket that is connected to the peer socket that call connect()
-         * - socklen_t* : point to an int that must be initialized to the size of the buffer pointed by sockadd*
-         * - sockadd* : point to address of the peer socket
-         * => BOTH sockadd* and socklen_t* could be specified as NULL if you're not interested in the address of the peer socket
-         * => of course we can revive this info later by using getpeername() system call
-         */
-        socketClient = accept(socketServer, (sockaddr *)&clientInfo, (socklen_t *)&clLen);
-        if (socketClient < 0) {
-            continue;
-        }
-        std::cout << "Incoming connection from address " << inet_ntoa(clientInfo.sin_addr) << " port " << ntohs(clientInfo.sin_port) << endl;
-        // thread handleClient{&ServerApp::handleNewConnection, this, socketClient};
-        threads.push_back(make_unique<thread>(&ServerApp::handleNewConnection, this, socketClient));
-        if (threads.size() == MAX_PENDING_CONNECTION) {
-            break;
-        }
-    }
-    for (auto &threadHandle : threads) {
-        threadHandle->join();
-    }
-    std::cout << "Close sever application \n";
-    close(socketServer);
+    _serverHandlerPtr->onRun();
+    waitForTerminationRequest();
+    _serverHandlerPtr->onStop();
     return EX_OK;
 }
+
 const char *ServerApp::name() const { return SERVER_NAME; }
 
 void ServerApp::handleNewConnection(int clientSocket) {
