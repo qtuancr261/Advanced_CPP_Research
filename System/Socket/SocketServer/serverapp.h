@@ -22,7 +22,6 @@
 #include <Poco/Util/OptionSet.h>
 #include <Poco/Util/ServerApplication.h>
 #include "messages/MessageClientReqRegister.h"
-#include "roomchat.h"
 #include "servercore.h"
 
 using Poco::Util::Option;
@@ -30,7 +29,6 @@ using Poco::Util::OptionSet;
 using Poco::Util::ServerApplication;
 using std::thread;
 using std::vector;
-using RoomChatPtr = shared_ptr<RoomChat>;
 class ServerApp : public ServerApplication {
 private:
     inline static const int MAX_PENDING_CONNECTION{5};
@@ -40,8 +38,6 @@ private:
     std::string _portOrUnixPath;
 
     std::unique_ptr<ServerCore> _serverHandlerPtr;
-    RoomChatPtr _publicRoom;
-    vector<RoomChatPtr> _privatesRoom;
 
 public:
     ServerApp();
