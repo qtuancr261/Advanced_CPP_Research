@@ -17,12 +17,35 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp \
     client_core.cpp \
     bufferwrapper.cpp \
+    clientapp.cpp \
     messages/MessageClientBase.cpp \
     messages/MessageClientReqRegister.cpp 
 
 HEADERS += \
     client_core.h \
     bufferwrapper.h \
+    clientapp.h \
     messages/MessageClientBase.h \
     messages/MessageClientReqRegister.h \
     messages/MessageDef.h
+
+unix:!macx: LIBS += -L$$PWD/../Poco/lib/ -lPocoUtil -lPocoNet  -lPocoXML -lPocoJSON -lPocoFoundation
+
+INCLUDEPATH += $$PWD/../Poco/Util/include \
+               $$PWD/../Poco/Net/include \
+               $$PWD/../Poco/XML/include \
+               $$PWD/../Poco/JSON/include \
+               $$PWD/../Poco/Foundation/include \
+
+
+DEPENDPATH += $$PWD/../Poco/Util/include \
+              $$PWD/../Poco/Net/include \
+              $$PWD/../Poco/XML/include \
+              $$PWD/../Poco/JSON/include \
+              $$PWD/../Poco/Foundation/include \
+
+unix:!macx: PRE_TARGETDEPS += $$PWD/../Poco/lib/libPocoUtil.a \
+                              $$PWD/../Poco/lib/libPocoNet.a \
+                              $$PWD/../Poco/lib/libPocoXML.a \
+                              $$PWD/../Poco/lib/libPocoJSON.a \
+                              $$PWD/../Poco/lib/libPocoFoundation.a \

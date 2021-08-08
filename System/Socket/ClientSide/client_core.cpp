@@ -5,32 +5,134 @@ Client_Core::Client_Core()
     , binaryData{nullptr}
     , send_message{nullptr}
     , dataSize{0}
-    , clientFD{-1}
+    , _clientfd{-1}
     , MESSAGE_SIZE{200}
     , RECV_MESSAGE_SIZE{200000}
 
 {
-    clientFD = socket(AF_INET, SOCK_STREAM, 0);
-    if (clientFD < 0) {
+    _clientfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (_clientfd < 0) {
         printf("Couldn't create socket");
         exit(EXIT_FAILURE);
     }
 }
 
-bool Client_Core::connectToServer(int serverPort, const char* serverAddress) const {
-    sockaddr_in server;
-    server.sin_family = AF_INET;
-    server.sin_port = htons(serverPort);
-    server.sin_addr.s_addr = inet_addr(serverAddress);
-    /* System call: connect(sockfd, struct sockaddr*, socklent_t)
-     * - connect the active socket referred to by the socketfd to the listening socket- specified by sockaddr* and socklen_t
-     */
-    if (connect(clientFD, (sockaddr*)&server, sizeof(server)) < 0) return false;
+Client_Core::Client_Core(const std::string& sysName,
+                         int sockDomain,
+                         int sockType,
+                         const std::string& host,
+                         const std::string& portOrPath,
+                         const std::string& clientName)
+    : userName{clientName}
+    , fileName{}
+    , binaryData{nullptr}
+    , send_message{nullptr}
+    , dataSize{0}
+    , _clientfd{-1}
+    , MESSAGE_SIZE{200}
+    , RECV_MESSAGE_SIZE{200000}
+    , _sysName{sysName}
+    , _sockDomain{sockDomain}
+    , _sockType{sockType}
+    , _host{host}
+    , _inetPort{0}
+    , _unixPath{"/tmp/afunix"} {
+    switch (_sockDomain) {
+        case AF_UNIX:
+            _unixPath = portOrPath;
+            break;
+        case AF_INET:
+        case AF_INET6:
+            try {
+                _inetPort = std::stoi(portOrPath);
+            } catch (const std::exception& exception) {
+                std::cerr << "ClientCore error: " << exception.what();
+            }
+            break;
+    }
+}
+
+Client_Core::~Client_Core() {}
+
+const char* Client_Core::name() const { return _sysName.c_str(); }
+
+void Client_Core::initialize(Application& app) {
+    if (initSocket() != 0) {
+        _clientfd = -1;
+    }
+}
+
+void Client_Core::uninitialize() {}
+
+void Client_Core::onRun() {
+    // connect to server
+    connectToServer();
+    // handle communication with server
+    sendMessage();
+    recvMessage();
+}
+
+void Client_Core::onStop() {}
+
+int Client_Core::initSocket() {
+    _clientfd = socket(_sockDomain, _sockType, 0);
+    if (_clientfd < 0) {
+        std::cerr << "Error when create socket";
+        return EX_OSERR;
+    }
+    return 0;
+}
+
+bool Client_Core::connectToServer() const {
+    switch (_sockDomain) {
+        case AF_UNIX: {
+            sockaddr_un serveraddr;
+            memset(&serveraddr, 0, sizeof(sockaddr_un));
+            serveraddr.sun_family = _sockDomain;
+            if (_unixPath.size() > (sizeof(sockaddr_un::sun_path) - 1)) {
+                std::cerr << "unix path size must be smaller than " << sizeof(sockaddr_un::sun_path);
+                return EX_IOERR;
+            }
+            strncpy(serveraddr.sun_path, _unixPath.c_str(), _unixPath.size());
+            /* System call: connect(sockfd, struct sockaddr*, socklent_t)
+             * - connect the active socket referred to by the socketfd to the listening socket- specified by sockaddr* and socklen_t
+             */
+            if (connect(_clientfd, (sockaddr*)&serveraddr, sizeof(sockaddr_un)) < 0) return EX_TEMPFAIL;
+            break;
+        }
+
+        case AF_INET:
+            break;
+        case AF_INET6:
+            break;
+    }
+    //    sockaddr_in server;
+    //    server.sin_family = AF_INET;
+    //    server.sin_port = htons(serverPort);
+    //    server.sin_addr.s_addr = inet_addr(serverAddress);
+
+    //    if (connect(_clientfd, (sockaddr*)&server, sizeof(server)) < 0) return false;
+    //    return true;
+    std::clog << "Established connection ...\n";
     return true;
 }
 
+void Client_Core::sendMessage() {
+    std::cout << "Name " << userName << std::endl;
+    write(_clientfd, userName.data(), userName.size());
+}
+
+void Client_Core::recvMessage() {
+    char tmpBuf[1000];
+    while (true) {
+        while (read(_clientfd, tmpBuf, 1000) > 0) {
+            std::cout << "From server " << tmpBuf << std::endl;
+        }
+    }
+}
+
 void Client_Core::handleSendStream() {
-    send(clientFD, userName.toStdString().data(), strlen(userName.toStdString().data()), 0);
+    send(_clientfd, userName.data(), userName.size(), 0);
     while (true) {
         int send_size{};
         send_message = new char[MESSAGE_SIZE];
@@ -43,13 +145,12 @@ void Client_Core::handleSendStream() {
             send_size = 1;
             if (getBinaryDataFromFile()) {
                 createMessageForSendFile();
-                send_size = send(clientFD, send_message_file, strlen(send_message_file), 0);
+                send_size = send(_clientfd, send_message_file.get(), strlen(send_message_file.get()), 0);
                 fgets(subString, 100, stdin);
-                send_size = send(clientFD, binaryData, dataSize, 0);
-                delete[] send_message_file;
+                send_size = send(_clientfd, binaryData, dataSize, 0);
             }
         } else
-            send_size = send(clientFD, send_message, strlen(send_message), 0);
+            send_size = send(_clientfd, send_message, strlen(send_message), 0);
         delete[] send_message;
         // delete[] binaryData;
         if (send_size <= 0) break;
@@ -82,13 +183,13 @@ void Client_Core::handleReceiveStream() {
     //    }
     while (true) {
         uint8_t* data = new uint8_t[4];
-        read(clientFD, data, 4);
+        read(_clientfd, data, 4);
         size_t framSize = *(uint32_t*)data;
         std::cout << "Framsize " << framSize << std::endl;
         shared_ptr<uint8_t[]> messageData{new uint8_t[framSize]};
         BufferWrapper wrap(messageData.get(), framSize);
         wrap.writeInt(framSize);
-        read(clientFD, messageData.get() + 4, framSize);
+        read(_clientfd, messageData.get() + 4, framSize);
         MessageClientReqRegister mess{};
         mess.deserialize(messageData, framSize);
         std::cout << "Name " << mess.name << std::endl;
@@ -123,13 +224,13 @@ void Client_Core::writeBinaryDataFromFile() {
 }
 
 void Client_Core::createMessageForSendFile() {
-    send_message_file = new char[MESSAGE_SIZE]{};
-    strcat(send_message_file, "<FILE>");
-    strcat(send_message_file, " ");
-    strcat(send_message_file, fileName.toStdString().data());
-    strcat(send_message_file, " ");
-    strcat(send_message_file, std::to_string(dataSize).data());
-    cout << send_message_file;
+    send_message_file.reset(new char[MESSAGE_SIZE]{});
+    strcat(send_message_file.get(), "<FILE>");
+    strcat(send_message_file.get(), " ");
+    strcat(send_message_file.get(), fileName.toStdString().data());
+    strcat(send_message_file.get(), " ");
+    strcat(send_message_file.get(), std::to_string(dataSize).data());
+    cout << send_message_file.get();
 }
 
 bool Client_Core::DoesClientRequestSendFile() {
@@ -140,19 +241,4 @@ bool Client_Core::DoesClientRequestSendFile() {
 bool Client_Core::DoesClientRequestRecvFile() {
     static const char SEND_FILE_HEADER[]{"<FILE>"};
     return (strstr(recv_message, SEND_FILE_HEADER) != nullptr ? true : false);
-}
-void Client_Core::setClientName(QString userName) {
-    if (connectToServer(2610, "127.0.0.1"))
-        printf(" -> connection successfully\n");
-    else
-        printf(" -> connection failed\n");
-    this->userName = userName;
-    /*pthread_t clientHandleSendThread{};
-    if (pthread_create(&clientHandleSendThread, nullptr, wrapper_handlerSendStream, this) != 0)
-    {
-        printf(" -> create thread failed");
-        exit(1);
-    }*/
-
-    // threadS = std::thread(&Client_Core::handleSendStream, this);
 }
