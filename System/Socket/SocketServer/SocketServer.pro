@@ -16,20 +16,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += main.cpp \
-    client.cpp \
     messages/MessageClientBase.cpp \
     messages/MessageClientReqRegister.cpp \
-    roomchat.cpp \
     bufferwrapper.cpp \
     serverapp.cpp \
     servercore.cpp
 
 HEADERS += \
-    client.h \
     messages/MessageClientBase.h \
     messages/MessageClientReqRegister.h \
     messages/MessageDef.h \
-    roomchat.h \
     bufferwrapper.h \
     serverapp.h \
     servercore.h

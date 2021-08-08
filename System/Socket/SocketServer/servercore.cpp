@@ -155,13 +155,24 @@ int ServerCore::connectionsHandle(int clientFd) {
     struct sockaddr *clientAddr{NULL};
     socklen_t clientAddrLen{0};
     switch (_sockDomain) {
-        case AF_UNIX:
+        case AF_UNIX: {
             struct sockaddr_un unixClient;
             clientAddr = (struct sockaddr *)&unixClient;
             // clientAddrLen = sizeof(sockaddr_un);
             getpeername(clientFd, clientAddr, &clientAddrLen);
-            std::cout << " Running connectionHandler for: Client info " << unixClient.sun_path << "\n";
+            std::cout << " Running connectionHandler for: Client info " << unixClient.sun_family << "\n";
+            char message[]{"Welcome to AF_UNIX server"};
+            char recvMessage[1000];
+            write(clientFd, message, strlen(message));
+            while (true) {
+                if (read(clientFd, recvMessage, 1000) > 0) {
+                    std::cout << "From client : " << recvMessage << std::endl;
+                    break;
+                }
+            }
+
             break;
+        }
         case AF_INET:
             struct sockaddr_in inetClient;
             clientAddr = (struct sockaddr *)&inetClient;
@@ -173,6 +184,5 @@ int ServerCore::connectionsHandle(int clientFd) {
             break;
     }
     close(clientFd);
-    // getpeername(clientFd, )
     return 0;
 }

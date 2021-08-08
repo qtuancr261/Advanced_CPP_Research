@@ -5,9 +5,7 @@ ServerApp::ServerApp()
 
 void ServerApp::initialize(Poco::Util::Application &self) {
     std::clog << " Initializing ...\n";
-    _serverHandlerPtr.release();
-    _serverHandlerPtr = make_unique<ServerCore>("SocketServer", _sockDomain, SOCK_STREAM, _portOrUnixPath);
-    addSubsystem(_serverHandlerPtr.get());
+    addSubsystem(new ServerCore{"SocketServer", _sockDomain, SOCK_STREAM, _portOrUnixPath});
     Application::initialize(self);
 }
 
@@ -63,9 +61,9 @@ int ServerApp::main(const std::vector<std::string> &args) {
     if (_isPrintHelp) {
         return EXIT_OK;
     }
-    _serverHandlerPtr->onRun();
+    Application::instance().getSubsystem<ServerCore>().onRun();
     waitForTerminationRequest();
-    _serverHandlerPtr->onStop();
+    Application::instance().getSubsystem<ServerCore>().onStop();
     return EX_OK;
 }
 

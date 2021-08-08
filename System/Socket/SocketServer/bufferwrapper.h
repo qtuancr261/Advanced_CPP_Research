@@ -1,13 +1,6 @@
-/*
- * Author: tuantq3
- * File: bufferwrapper.h
- *
- * Created on 6/8/2019
- */
 #ifndef BUFFERWRAPPER_H
 #define BUFFERWRAPPER_H
 
-#include <bits/stdint-uintn.h>
 #include <stdint.h>
 #include <cassert>
 #include <cstddef>
@@ -38,7 +31,7 @@ public:
     virtual ~BufferWrapper();
     size_t sizeRemain() const;
 
-public:  // write functions
+public:	 // write functions
     template <typename T>
     bool writeInt(T value) {
         if (_sizeRemain < sizeof(value)) return false;
@@ -50,7 +43,7 @@ public:  // write functions
 
     bool writeString(const string& srcString);
 
-public:  // read functions
+public:	 // read functions
     template <typename T>
     bool readInt(T& value) {
         if (_sizeRemain < sizeof(value)) return false;
@@ -62,9 +55,9 @@ public:  // read functions
 
     bool readString(string& desString);
 
-public:  // unit tests
+public:	 // unit tests
     static bool serializeDeserializeNumber();
     static bool serializeDeserializeString();
 };
 
-#endif  // BUFFERWRAPPER_H
+#endif	// BUFFERWRAPPER_H
