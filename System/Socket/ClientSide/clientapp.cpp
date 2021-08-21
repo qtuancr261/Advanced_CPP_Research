@@ -17,7 +17,7 @@ void ClientApp::uninitialize() {
 }
 
 void ClientApp::defineOptions(Poco::Util::OptionSet &options) {
-    Application::defineOptions(options);
+    ServerApplication::defineOptions(options);
     options.addOption(Option("help", "h", "display help", false));
     options.addOption(Option("domain", "d", "set socket domain", true, "domain type", true));
     options.addOption(Option("host", "o", "set host ", true, "hostname", true));
@@ -67,8 +67,8 @@ int ClientApp::main(const std::vector<std::string> &args) {
     if (_isPrintHelp) {
         return EXIT_OK;
     }
-    Application::instance().getSubsystem<Client_Core>().onRun();
+    ServerApplication::instance().getSubsystem<Client_Core>().onRun();
     waitForTerminationRequest();
-    Application::instance().getSubsystem<Client_Core>().onStop();
+    ServerApplication::instance().getSubsystem<Client_Core>().onStop();
     return EXIT_OK;
 }

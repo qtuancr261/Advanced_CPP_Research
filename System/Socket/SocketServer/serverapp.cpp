@@ -6,18 +6,18 @@ ServerApp::ServerApp()
 void ServerApp::initialize(Poco::Util::Application &self) {
     std::clog << " Initializing ...\n";
     addSubsystem(new ServerCore{"SocketServer", _sockDomain, SOCK_STREAM, _portOrUnixPath});
-    Application::initialize(self);
+    ServerApplication::initialize(self);
 }
 
 void ServerApp::uninitialize() {
     std::clog << " Uninitializing ...\n";
-    Application::uninitialize();
+    ServerApplication::uninitialize();
 }
 
 void ServerApp::reinitialize(Poco::Util::Application &selft) {}
 
 void ServerApp::defineOptions(Poco::Util::OptionSet &options) {
-    Application::defineOptions(options);
+    ServerApplication::defineOptions(options);
     options.addOption(Option("help", "h", "display help", false));
     options.addOption(Option("domain", "d", "set socket domain", true, "domain type", true));
     options.addOption(Option("port", "p", "set path for AF_UNIX or port for AF_INET/INET6", true, "port/path", true));
@@ -61,9 +61,9 @@ int ServerApp::main(const std::vector<std::string> &args) {
     if (_isPrintHelp) {
         return EXIT_OK;
     }
-    Application::instance().getSubsystem<ServerCore>().onRun();
+    ServerApplication::instance().getSubsystem<ServerCore>().onRun();
     waitForTerminationRequest();
-    Application::instance().getSubsystem<ServerCore>().onStop();
+    ServerApplication::instance().getSubsystem<ServerCore>().onStop();
     return EX_OK;
 }
 
