@@ -19,7 +19,9 @@ public:
     static void calculateSum(Iterator first, Iterator last, T& result) {
         // this->operator()();
         result = accumulate(first, last, 0);
+        //
+        std::clog << "Thread id " << std::this_thread::get_id() << " calculated result: " << result << " - on CPU " << sched_getcpu() << std::endl;
     }
 };
 
-#endif  // WORKER_H
+#endif	// WORKER_H

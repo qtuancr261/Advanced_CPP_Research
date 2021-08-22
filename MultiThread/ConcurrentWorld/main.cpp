@@ -10,7 +10,8 @@
 using namespace std;
 struct funct {
     int& _refI;
-    funct(int& refI) : _refI{refI} {
+    funct(int& refI)
+        : _refI{refI} {
         // init
     }
 
@@ -69,7 +70,7 @@ T parallel_calculateSum(Iterator first, Iterator last, T initValue = 0) {
     }
     return std::accumulate(std::begin(results), std::end(results), initValue);
 }
-int main() {
+int main(int argc, char* argv[]) {
     int i = 20;
     funct F1{i};
     // std::thread works with any callable type
@@ -91,6 +92,7 @@ int main() {
 
     //
     thread thread_x(&funct::testThis);
+    thread_x.join();
 
     string message{"Hello"};
     // By default the arguments are copied into internal storage
@@ -114,10 +116,17 @@ int main() {
     std::random_device randDev;
     std::uniform_int_distribution<int> uniformDistribution{0, 1000};
     std::default_random_engine randEngine{randDev()};
-    std::vector<int> randNumbers(12, 0);
-    for (int& num : randNumbers) {
-        num = uniformDistribution(randEngine);
-    }
+    std::vector<int> randNumbers(320, 0);
+    auto generateIntNumber = [&uniformDistribution, &randEngine]() { return uniformDistribution(randEngine); };
+    // first approaching - raw loop
+    //    for (int& num : randNumbers) {
+    //        num = uniformDistribution(randEngine);
+    //    }
+    // second approaching - std::fill - same random value for all vector entries
+    //    std::fill(randNumbers.begin(), randNumbers.end(), generateIntNumber());
+    // third approaching - std::generate - random value per vector entry
+    std::generate(randNumbers.begin(), randNumbers.end(), generateIntNumber);
+
     std::copy(std::begin(randNumbers), std::end(randNumbers), std::ostream_iterator<int>{std::cout, " - "});
     std::cout << std::endl << "Sum by std::accumulate: " << std::accumulate(std::begin(randNumbers), std::end(randNumbers), 0) << std::endl;
     std::cout << std::endl
