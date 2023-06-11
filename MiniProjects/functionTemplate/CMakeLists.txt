@@ -4,4 +4,4 @@ set(projectName functionTemplate)
 project(${projectName} LANGUAGES CXX)
 include_directories(${PROJECT_SOURCE_DIR}/inc)
 
-add_executable(${projectName} inc/ftemplate.h inc/list.h inc/node.h inc/stack.h src/main.cpp)
+add_executable(${projectName} inc/ftemplate.h inc/list.h inc/node.h inc/stack.h inc/message.h src/message.cpp src/main.cpp)
