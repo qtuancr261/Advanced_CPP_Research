@@ -6,13 +6,15 @@
 #include "list.h"
 #include "message.h"
 #include "stack.h"
+#include "version.h"
+// #include "generated/version.h"
 using std::string;
 // for testing template only
 void test(int a) {
 	cout << a;
 }
 int main(int argc, char *argv[]) {
-	stack<string> sqlStatement;
+	stack<string> sqlStatement{};
 	sqlStatement.push("Unity DE");
 	sqlStatement.push("KDE");
 	sqlStatement.push("Cinnamon");
@@ -22,5 +24,6 @@ int main(int argc, char *argv[]) {
 
 	Message txtMessage{5};
 	cout << "Message id: " << txtMessage.getId() << endl;
+	cout << "Project version " << PROJECT_VERSION << endl;
 	return 0;
 }
