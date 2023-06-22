@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 set(projectName functionTemplate)
-string(TIMESTAMP _configuration_time "%Y.%m.%d%H%M" UTC)
+string(TIMESTAMP _configuration_time "%y.%m.%d.%H%M" UTC)
 message("## Build time: " ${_configuration_time})
 project(${projectName} VERSION ${_configuration_time} LANGUAGES CXX)
 include_directories(${PROJECT_SOURCE_DIR}/inc)
